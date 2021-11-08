@@ -1,14 +1,20 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) 2021 EldoriaRPG Team and Contributor
+ */
+
 package de.eldoria.schematicsaver.config.elements.template;
 
+import com.sk89q.worldedit.util.Direction;
 import de.eldoria.schematicsaver.commands.builder.TypeBuilder;
 import de.eldoria.schematicsaver.commands.builder.VariantBuilder;
 import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
 
 public class Variant {
     String name;
     int rotation;
-    Vector flip;
+    Direction flip;
     BoundingBox boundings;
 
     public String name() {
@@ -19,7 +25,7 @@ public class Variant {
         return rotation;
     }
 
-    public Vector flip() {
+    public Direction flip() {
         return flip;
     }
 

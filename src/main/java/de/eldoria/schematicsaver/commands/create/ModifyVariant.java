@@ -15,9 +15,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public class RemoveType extends AdvancedCommand implements IPlayerTabExecutor {
-    public RemoveType(Plugin plugin, Sessions sessions) {
-        super(plugin, CommandMeta.builder("removeType")
+public class ModifyVariant extends AdvancedCommand implements IPlayerTabExecutor {
+    public ModifyVariant(Plugin plugin, Sessions sessions) {
+        super(plugin, CommandMeta.builder("modifyVariant")
                 .build());
     }
 
