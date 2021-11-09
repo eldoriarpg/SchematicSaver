@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TypeBuilder implements Buildable<Type>, PathComponent {
     private final TemplateBuilder template;
@@ -52,13 +53,13 @@ public class TypeBuilder implements Buildable<Type>, PathComponent {
         return name;
     }
 
-    public boolean removeVariant(String name) {
-        return variants.remove(name.toLowerCase(Locale.ROOT)) != null;
+    public void removeVariant(String name) throws CommandException {
+       CommandAssertions.isTrue(variants.remove(name.toLowerCase(Locale.ROOT)) != null, "error.unkownVariant");
     }
 
     @Override
     public Type build() {
-        return null;
+        return new Type(name, variants.values().stream().map(VariantBuilder::build).collect(Collectors.toList()));
     }
 
     @Override
@@ -76,5 +77,10 @@ public class TypeBuilder implements Buildable<Type>, PathComponent {
 
     public TemplateBuilder template() {
         return template;
+    }
+
+    public VariantBuilder getVariant(String name) throws CommandException {
+        CommandAssertions.isTrue(variants.containsKey(name.toLowerCase(Locale.ROOT)), "error.unkownVariant");
+        return variants.get(name.toLowerCase(Locale.ROOT));
     }
 }

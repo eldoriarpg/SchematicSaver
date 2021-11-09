@@ -28,7 +28,7 @@ public class AddType extends AdvancedCommand implements IPlayerTabExecutor {
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
         var session = sessions.getSession(player);
-        var typeBuilder = session.addType(args.asString(0));
-        sessions.render(player, typeBuilder);
+        var type = session.addType(args.asString(0));
+        sessions.render(player, type);
     }
 }

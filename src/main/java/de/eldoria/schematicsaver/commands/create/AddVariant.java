@@ -16,6 +16,7 @@ import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
+import de.eldoria.schematicsaver.commands.util.WorldEditSelection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
@@ -38,26 +39,11 @@ public class AddVariant extends AdvancedCommand implements IPlayerTabExecutor {
         var session = sessions.getSession(player);
         var type = session.getType(args.asString(0));
 
-        var localSession = worldEdit.getSessionManager().get(BukkitAdapter.adapt(player));
-        Region selection;
-        try {
-            selection = localSession.getSelection(BukkitAdapter.adapt(player.getWorld()));
-        } catch (IncompleteRegionException e) {
-            throw CommandException.message("error.incompleteSelection");
-        }
-
-        if (!(selection instanceof CuboidRegion region)) {
-            throw CommandException.message("error.nonCuboidSelection");
-        }
-
-        var box = BoundingBox.of(
-                BukkitAdapter.adapt(player.getWorld(), region.getMinimumPoint()),
-                BukkitAdapter.adapt(player.getWorld(), region.getMaximumPoint()));
+        var box = WorldEditSelection.getSelectionBoundings(player);
 
         session.assertOverlap(box);
 
-        var typeBuilder = type.addVariant(args.asString(1), box);
-        sessions.render(player, typeBuilder);
-
+        var variant = type.addVariant(args.asString(1), box);
+        sessions.render(player, variant);
     }
 }

@@ -16,13 +16,17 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 public class ShowType extends AdvancedCommand implements IPlayerTabExecutor {
+    private final Sessions sessions;
+
     public ShowType(Plugin plugin, Sessions sessions) {
         super(plugin, CommandMeta.builder("showType")
+                .addUnlocalizedArgument("type", true)
                 .build());
+        this.sessions = sessions;
     }
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-
+        sessions.render(player, sessions.getSession(player).getType(args.asString(0)));
     }
 }

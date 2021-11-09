@@ -25,8 +25,8 @@ import de.eldoria.schematicsaver.commands.create.ShowVariant;
 import de.eldoria.schematicsaver.config.Configuration;
 import org.bukkit.plugin.Plugin;
 
-public class SchematicSaver extends AdvancedCommand {
-    public SchematicSaver(Plugin plugin, MessageBlocker messageBlocker, Configuration configuration) {
+public class SchematicTemplate extends AdvancedCommand {
+    public SchematicTemplate(Plugin plugin, MessageBlocker messageBlocker, Configuration configuration) {
         super(plugin, CommandMeta.builder("schematicSaver")
                 .buildSubCommands((cmds, builder) -> {
                     var sessions = new Sessions(plugin, messageBlocker, configuration);
@@ -38,7 +38,7 @@ public class SchematicSaver extends AdvancedCommand {
                     cmds.add(new ModifyVariant(plugin, sessions));
                     cmds.add(new RemoveType(plugin, sessions));
                     cmds.add(new RemoveVariant(plugin, sessions));
-                    cmds.add(new Save(plugin, sessions));
+                    cmds.add(new Save(plugin, sessions, configuration));
                     cmds.add(new Show(plugin, sessions));
                     cmds.add(new ShowType(plugin, sessions));
                     cmds.add(new ShowVariant(plugin, sessions));

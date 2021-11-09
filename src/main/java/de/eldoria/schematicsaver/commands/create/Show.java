@@ -19,14 +19,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class Show extends AdvancedCommand implements IPlayerTabExecutor {
+    private final Sessions sessions;
+
     public Show(Plugin plugin, Sessions sessions) {
         super(plugin, CommandMeta.builder("show")
                 .build());
+        this.sessions = sessions;
     }
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-
+        sessions.render(player, sessions.getSession(player));
     }
 
     @Override

@@ -67,7 +67,7 @@ public class VariantBuilder implements Buildable<Variant>, PathComponent {
 
     @Override
     public Variant build() {
-        return null;
+        return new Variant(name, rotation, flip, relative());
     }
 
     public BoundingBox relative() {

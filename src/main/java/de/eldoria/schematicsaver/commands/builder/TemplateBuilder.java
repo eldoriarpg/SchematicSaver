@@ -15,8 +15,10 @@ import org.bukkit.util.Vector;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TemplateBuilder implements Buildable<Template> {
     private String name;
@@ -37,8 +39,8 @@ public class TemplateBuilder implements Buildable<Template> {
         return types.get(name.toLowerCase(Locale.ROOT));
     }
 
-    public boolean removeType(String name) {
-        return types.remove(name.toLowerCase(Locale.ROOT)) != null;
+    public void removeType(String name) throws CommandException{
+        CommandAssertions.isTrue(types.remove(name.toLowerCase(Locale.ROOT)) != null, "error.unkownType");
     }
 
     public void assertOverlap(BoundingBox box) throws CommandException {
@@ -49,7 +51,8 @@ public class TemplateBuilder implements Buildable<Template> {
 
     @Override
     public Template build() {
-        return new Template();
+        var collect = types.values().stream().map(TypeBuilder::build).collect(Collectors.toList());
+        return new Template(name, collect);
     }
 
     public void addType(Type value) {

@@ -16,13 +16,19 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 public class RemoveType extends AdvancedCommand implements IPlayerTabExecutor {
+    private final Sessions sessions;
+
     public RemoveType(Plugin plugin, Sessions sessions) {
         super(plugin, CommandMeta.builder("removeType")
+                .addUnlocalizedArgument("type_name", true)
                 .build());
+        this.sessions = sessions;
     }
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-
+        var session = sessions.getSession(player);
+        session.removeType(args.asString(0));
+        sessions.render(player, session);
     }
 }

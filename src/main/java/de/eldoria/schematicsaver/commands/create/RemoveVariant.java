@@ -16,13 +16,19 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 public class RemoveVariant extends AdvancedCommand implements IPlayerTabExecutor {
+    private final Sessions sessions;
+
     public RemoveVariant(Plugin plugin, Sessions sessions) {
         super(plugin, CommandMeta.builder("removeVariant")
                 .build());
+        this.sessions = sessions;
     }
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-
+        var session = sessions.getSession(player);
+        var type = session.getType(args.asString(0));
+        type.removeVariant(args.asString(1));
+        sessions.render(player, type);
     }
 }

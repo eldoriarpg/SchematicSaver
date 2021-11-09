@@ -136,4 +136,9 @@ public class Sessions {
         CommandAssertions.isTrue(templateBuilder != null, "error.noSession");
         return templateBuilder;
     }
+
+    public void close(Player player) {
+        sessions.remove(player.getUniqueId());
+        messageBlocker.unblockPlayer(player);
+    }
 }
