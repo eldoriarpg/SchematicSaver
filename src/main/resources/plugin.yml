@@ -3,5 +3,7 @@ main: de.eldoria.schematicsaver.SchematicSaver
 version: ${version}
 
 commands:
-  schematicTemplate:
+  schematictemplate:
     description: ""
+    aliases:
+      - schemtemp

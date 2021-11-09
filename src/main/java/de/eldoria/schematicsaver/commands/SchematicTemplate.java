@@ -29,7 +29,7 @@ import org.bukkit.plugin.Plugin;
 
 public class SchematicTemplate extends AdvancedCommand {
     public SchematicTemplate(Plugin plugin, MessageBlocker messageBlocker, BoundingRender boundingRender, Configuration configuration) {
-        super(plugin, CommandMeta.builder("schematicTemplate")
+        super(plugin, CommandMeta.builder("schematictemplate")
                 .buildSubCommands((cmds, builder) -> {
                     var sessions = new Sessions(plugin, messageBlocker, configuration);
                     cmds.add(new AddType(plugin, sessions));
