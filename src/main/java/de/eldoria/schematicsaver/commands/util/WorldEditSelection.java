@@ -15,8 +15,12 @@ import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 
-public class WorldEditSelection {
+public final class WorldEditSelection {
     private static final WorldEdit WORLD_EDIT = WorldEdit.getInstance();
+
+    private WorldEditSelection() {
+        throw new UnsupportedOperationException("This is a utility class.");
+    }
 
     public static BoundingBox getSelectionBoundings(Player player) throws CommandException {
         var localSession = WORLD_EDIT.getSessionManager().get(BukkitAdapter.adapt(player));

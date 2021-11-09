@@ -75,4 +75,8 @@ public class TemplateBuilder implements Buildable<Template> {
     public void origin(Vector origin) {
         this.origin = origin;
     }
+
+    public List<BoundingBox> getBoundings(){
+        return types.values().stream().flatMap(typeBuilder -> typeBuilder.getBoundings().stream()).collect(Collectors.toList());
+    }
 }

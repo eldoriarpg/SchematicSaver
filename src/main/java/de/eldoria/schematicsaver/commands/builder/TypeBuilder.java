@@ -14,6 +14,7 @@ import org.bukkit.util.BoundingBox;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,5 +83,9 @@ public class TypeBuilder implements Buildable<Type>, PathComponent {
     public VariantBuilder getVariant(String name) throws CommandException {
         CommandAssertions.isTrue(variants.containsKey(name.toLowerCase(Locale.ROOT)), "error.unkownVariant");
         return variants.get(name.toLowerCase(Locale.ROOT));
+    }
+
+    public List<BoundingBox> getBoundings(){
+        return variants.values().stream().map(VariantBuilder::boundings).collect(Collectors.toList());
     }
 }
