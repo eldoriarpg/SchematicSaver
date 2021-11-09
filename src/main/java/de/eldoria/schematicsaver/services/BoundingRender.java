@@ -70,6 +70,25 @@ public class BoundingRender implements Runnable {
         addTask(player, l2, u2, color);
         addTask(player, l3, u3, color);
         addTask(player, l4, u4, color);
+
+        // cross implementation
+        addTask(player, u1, u3, color);
+        addTask(player, u2, u4, color);
+
+        addTask(player,l1, l3, color);
+        addTask(player,l2, l4, color);
+
+        addTask(player, u1, l4, color);
+        addTask(player, u4, l1, color);
+
+        addTask(player, u1, l2, color);
+        addTask(player, u2, l1, color);
+
+        addTask(player, u2, l3, color);
+        addTask(player, u3, l2, color);
+
+        addTask(player, u3, l4, color);
+        addTask(player, u4, l3, color);
     }
 
     private void addCircle(Player player, Color color, Vector vec1, Vector vec2, Vector vec3, Vector vec4) {
@@ -80,7 +99,7 @@ public class BoundingRender implements Runnable {
     }
 
     private void addTask(Player player, Vector origin, Vector direction, Color color) {
-        tasks.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>()).add(RenderTask.of(origin, direction, color, 10));
+        tasks.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>()).add(RenderTask.of(origin, direction, color, 40));
     }
 
     private Vector getVector(Vector x, Vector y, Vector z) {
@@ -117,37 +136,30 @@ public class BoundingRender implements Runnable {
         private final Vector origin;
         private final int steps;
         private final Vector step;
-        private final double red;
-        private final double green;
-        private final double blue;
+        private final Color color;
         private int duration;
 
-        private RenderTask(Vector origin, int duration, int steps, Vector step, double red, double green, double blue) {
+        private RenderTask(Vector origin, int duration, int steps, Vector step, Color color) {
             this.origin = origin;
             this.duration = duration;
             this.steps = steps;
             this.step = step;
-            this.red = red;
-            this.green = green;
-            this.blue = blue;
+            this.color = color;
         }
 
         private static RenderTask of(Vector origin, Vector target, Color color, int duration) {
             var direction = target.clone().subtract(origin);
             var steps = (int) (direction.length() / 0.5);
             var step = direction.normalize().multiply(0.5);
-            var red = color.getRed() == 0 ? Float.MIN_VALUE : color.getRed() / 255.0;
-            var green = color.getGreen() / 255.0;
-            var blue = color.getBlue() / 255.0;
-            return new RenderTask(origin, duration, steps, step, red, green, blue);
+            return new RenderTask(origin, duration, steps, step, color);
         }
 
         public boolean draw(Player player) {
             duration--;
             var loc = origin.clone();
             for (var i = 0; i < steps; i++) {
-                loc.add(step.clone().multiply(i));
-                player.spawnParticle(Particle.REDSTONE, loc.getX(), loc.getY(), loc.getZ(), 0, red, green, blue);
+                player.spawnParticle(Particle.REDSTONE, loc.getX(), loc.getY(), loc.getZ(), 0, new Particle.DustOptions(color, 1));
+                loc.add(step);
             }
             return duration <= 0;
         }

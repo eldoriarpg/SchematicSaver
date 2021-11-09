@@ -1,0 +1,7 @@
+name: SchematicSaver
+main: de.eldoria.schematicsaver.SchematicSaver
+version: ${version}
+
+commands:
+  schematicTemplate:
+    description: ""
