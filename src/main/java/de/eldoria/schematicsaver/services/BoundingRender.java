@@ -27,22 +27,16 @@ public class BoundingRender implements Runnable {
     }
 
     private void buildColors() {
-        colors.add(Color.WHITE);
-        colors.add(Color.GRAY);
-        colors.add(Color.SILVER);
-        colors.add(Color.BLACK);
-        colors.add(Color.RED);
-        colors.add(Color.MAROON);
-        colors.add(Color.YELLOW);
-        colors.add(Color.OLIVE);
-        colors.add(Color.LIME);
-        colors.add(Color.GREEN);
-        colors.add(Color.TEAL);
-        colors.add(Color.BLUE);
-        colors.add(Color.NAVY);
-        colors.add(Color.FUCHSIA);
-        colors.add(Color.PURPLE);
-        colors.add(Color.ORANGE);
+        var startColor = 105;
+        var step = 50;
+        for (var val = startColor; val < 255; val += step) {
+            colors.add(Color.fromBGR(val, 255, 0));
+            colors.add(Color.fromBGR(255, val, 0));
+            colors.add(Color.fromBGR(255, 0, val));
+            colors.add(Color.fromBGR(val, 0, 255));
+            colors.add(Color.fromBGR(0, val, 255));
+            colors.add(Color.fromBGR(0, 255, val));
+        }
     }
 
     private void highlightBoundings(Player player, BoundingBox box) {
@@ -75,8 +69,8 @@ public class BoundingRender implements Runnable {
         addTask(player, u1, u3, color);
         addTask(player, u2, u4, color);
 
-        addTask(player,l1, l3, color);
-        addTask(player,l2, l4, color);
+        addTask(player, l1, l3, color);
+        addTask(player, l2, l4, color);
 
         addTask(player, u1, l4, color);
         addTask(player, u4, l1, color);

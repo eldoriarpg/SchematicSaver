@@ -12,8 +12,10 @@ import de.eldoria.schematicsaver.config.elements.template.Template;
 import de.eldoria.schematicsaver.config.elements.template.Type;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 
 public class TemplateBuilder implements Buildable<Template> {
     private String name;
+    @NotNull
     private Vector origin;
     private Map<String, TypeBuilder> types = new LinkedHashMap<>();
 
@@ -29,8 +32,9 @@ public class TemplateBuilder implements Buildable<Template> {
         return name;
     }
 
-    public TemplateBuilder(String name) {
+    public TemplateBuilder(String name, Vector origin) {
         this.name = name;
+        this.origin = new Vector(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
     }
 
     public TypeBuilder addType(String name) throws CommandException {
@@ -43,9 +47,9 @@ public class TemplateBuilder implements Buildable<Template> {
         CommandAssertions.isTrue(types.remove(name.toLowerCase(Locale.ROOT)) != null, "error.unkownType");
     }
 
-    public void assertOverlap(BoundingBox box) throws CommandException {
+    public void assertOverlap(BoundingBox box, VariantBuilder variant) throws CommandException {
         for (var value : types.values()) {
-            value.assertOverlap(box);
+            value.assertOverlap(box, variant);
         }
     }
 
@@ -78,5 +82,9 @@ public class TemplateBuilder implements Buildable<Template> {
 
     public List<BoundingBox> getBoundings(){
         return types.values().stream().flatMap(typeBuilder -> typeBuilder.getBoundings().stream()).collect(Collectors.toList());
+    }
+
+    public Collection<String> typeNames() {
+        return Collections.unmodifiableCollection(types.keySet());
     }
 }

@@ -21,7 +21,7 @@ dependencies {
     compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.3.0-SNAPSHOT")
     compileOnly("org.jetbrains", "annotations", "20.1.0")
 
-    implementation("de.eldoria", "eldo-util", "1.12.0-DEV")
+    implementation("de.eldoria", "eldo-util", "1.12.1-DEV")
 
     implementation("de.eldoria", "messageblocker", "1.1.0")
     implementation("net.kyori", "adventure-platform-bukkit", "4.0.0")

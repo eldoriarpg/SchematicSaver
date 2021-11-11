@@ -11,9 +11,13 @@ import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
+import de.eldoria.eldoutilities.simplecommands.TabCompleteUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class RemoveType extends AdvancedCommand implements IPlayerTabExecutor {
     private final Sessions sessions;
@@ -30,5 +34,10 @@ public class RemoveType extends AdvancedCommand implements IPlayerTabExecutor {
         var session = sessions.getSession(player);
         session.removeType(args.asString(0));
         sessions.render(player, session);
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
+        return TabCompleteUtil.complete(args.asString(0), sessions.getSession(player).typeNames());
     }
 }

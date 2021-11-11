@@ -5,24 +5,28 @@ import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
-import de.eldoria.schematicsaver.commands.util.WorldEditSelection;
 import de.eldoria.schematicsaver.services.BoundingRender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public class ShowCurrentSelection extends AdvancedCommand implements IPlayerTabExecutor {
-    private final BoundingRender boundingRender;
+public class ShowTemplateSelections extends AdvancedCommand implements IPlayerTabExecutor {
+    private final Sessions sessions;
+    private final BoundingRender render;
 
-    public ShowCurrentSelection(Plugin plugin, BoundingRender boundingRender) {
-        super(plugin, CommandMeta.builder("showCurrentSelection")
+    public ShowTemplateSelections(Plugin plugin, Sessions sessions, BoundingRender render) {
+        super(plugin, CommandMeta.builder("showTemplateSelections")
                 .build());
-        this.boundingRender = boundingRender;
+        this.sessions = sessions;
+        this.render = render;
     }
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        var selectionBoundings = WorldEditSelection.getSelectionBoundings(player);
-        boundingRender.renderBox(player, selectionBoundings);
+        var session = sessions.getSession(player);
+        var boundings = session.getBoundings();
+        for (var bounding : boundings) {
+            render.renderBox(player, bounding);
+        }
     }
 }

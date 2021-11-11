@@ -9,6 +9,7 @@ package de.eldoria.schematicsaver.commands.util;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
@@ -38,5 +39,14 @@ public final class WorldEditSelection {
         return BoundingBox.of(
                 BukkitAdapter.adapt(player.getWorld(), region.getMinimumPoint()),
                 BukkitAdapter.adapt(player.getWorld(), region.getMaximumPoint()));
+    }
+
+    public static void setSelectionBoundings(Player player, BoundingBox box) throws CommandException {
+        var localSession = WORLD_EDIT.getSessionManager().get(BukkitAdapter.adapt(player));
+        var actor = BukkitAdapter.adapt(player);
+        var world = actor.getWorld();
+        var selector = localSession.getRegionSelector(world);
+        selector.selectPrimary(BukkitAdapter.adapt(box.getMin().toLocation(player.getWorld())).toVector().toBlockPoint(), ActorSelectorLimits.forActor(actor));
+        selector.selectSecondary(BukkitAdapter.adapt(box.getMax().toLocation(player.getWorld())).toVector().toBlockPoint(), ActorSelectorLimits.forActor(actor));
     }
 }

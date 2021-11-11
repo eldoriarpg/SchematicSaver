@@ -16,6 +16,10 @@ import de.eldoria.schematicsaver.config.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
 
 public class Create extends AdvancedCommand implements IPlayerTabExecutor {
     private final Sessions sessions;
@@ -31,9 +35,13 @@ public class Create extends AdvancedCommand implements IPlayerTabExecutor {
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        var template = configuration.templateRegistry().getTemplate(args.asString(0));
-        CommandAssertions.isTrue(template.isEmpty(), "error.templateAlreadyExists");
+        CommandAssertions.isFalse(configuration.templateRegistry().templateExists(args.asString(0)), "error.templateAlreadyExists");
         var templateBuilder = sessions.create(player, args.asString(0));
         sessions.render(player, templateBuilder);
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
+        return Collections.singletonList("template_name");
     }
 }

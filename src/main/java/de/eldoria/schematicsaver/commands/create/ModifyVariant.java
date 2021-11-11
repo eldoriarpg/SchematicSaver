@@ -12,11 +12,15 @@ import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
+import de.eldoria.eldoutilities.simplecommands.TabCompleteUtil;
 import de.eldoria.schematicsaver.commands.util.WorldEditSelection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 public class ModifyVariant extends AdvancedCommand implements IPlayerTabExecutor {
@@ -42,13 +46,36 @@ public class ModifyVariant extends AdvancedCommand implements IPlayerTabExecutor
         switch (args.asString(2).toLowerCase(Locale.ROOT)) {
             case "selection" -> {
                 var box = WorldEditSelection.getSelectionBoundings(player);
-                session.assertOverlap(box);
+                session.assertOverlap(box, variant);
                 type.assertEqualSize(box);
                 variant.boundings(box);
             }
-            case "direction" -> variant.flip(args.asEnum(3, Direction.class));
+            case "flip" -> variant.flip(args.asEnum(3, Direction.class));
             case "rotation" -> variant.rotation(args.asInt(3));
         }
         sessions.render(player, variant);
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
+        if (args.size() == 1) {
+            return TabCompleteUtil.complete(args.asString(0), sessions.getSession(player).typeNames());
+        }
+        if (args.size() == 2) {
+            return TabCompleteUtil.complete(args.asString(1), sessions.getSession(player).getType(args.asString(0)).variantNames());
+        }
+        if (args.size() == 3) {
+            return TabCompleteUtil.complete(args.asString(2), "selection", "rotation", "flip");
+        }
+        if ("selection".equalsIgnoreCase(args.asString(2))) {
+            return Collections.emptyList();
+        }
+        if ("rotation".equalsIgnoreCase(args.asString(2))) {
+            return TabCompleteUtil.complete(args.asString(3), "0", "90", "180", "270");
+        }
+        if ("flip".equalsIgnoreCase(args.asString(2))) {
+            return TabCompleteUtil.complete(args.asString(3), Direction.class);
+        }
+        return Collections.emptyList();
     }
 }

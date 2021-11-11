@@ -9,7 +9,6 @@ package de.eldoria.schematicsaver.commands.create;
 import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
 import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.command.util.Arguments;
-import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
 import de.eldoria.eldoutilities.simplecommands.TabCompleteUtil;
@@ -19,26 +18,23 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 
-public class Edit extends AdvancedCommand implements IPlayerTabExecutor {
-    private final Sessions sessions;
+public class RemoveTemplate extends AdvancedCommand implements IPlayerTabExecutor {
     private final Configuration configuration;
 
-    public Edit(Plugin plugin, Sessions sessions, Configuration configuration) {
-        super(plugin, CommandMeta.builder("edit")
-                .addUnlocalizedArgument("name", true)
+    public RemoveTemplate(Plugin plugin, Configuration configuration) {
+        super(plugin, CommandMeta.builder("removeTemplate")
+                .addUnlocalizedArgument("template", true)
                 .build());
-        this.sessions = sessions;
         this.configuration = configuration;
     }
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        var template = configuration.templateRegistry().getTemplate(args.asString(0));
-        var edit = sessions.edit(player, template);
-        sessions.render(player, edit);
+        configuration.templateRegistry().removeTemplate(args.asString(0));
+        configuration.save();
+        messageSender().sendMessage(player, "Template deleted.");
     }
 
     @Override

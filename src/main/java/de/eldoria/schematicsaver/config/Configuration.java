@@ -25,6 +25,7 @@ public class Configuration extends EldoConfig {
 
     @Override
     protected void saveConfigs() {
+        loadConfig(TEMPLATE_FILE, null, false).set("templates", templateRegistry);
     }
 
     public TemplateRegistry templateRegistry() {

@@ -15,14 +15,19 @@ import de.eldoria.schematicsaver.commands.create.Create;
 import de.eldoria.schematicsaver.commands.create.Edit;
 import de.eldoria.schematicsaver.commands.create.MessageBlock;
 import de.eldoria.schematicsaver.commands.create.ModifyVariant;
+import de.eldoria.schematicsaver.commands.create.RemoveTemplate;
 import de.eldoria.schematicsaver.commands.create.RemoveType;
 import de.eldoria.schematicsaver.commands.create.RemoveVariant;
 import de.eldoria.schematicsaver.commands.create.Save;
+import de.eldoria.schematicsaver.commands.create.SelectVariantRegion;
 import de.eldoria.schematicsaver.commands.create.Sessions;
 import de.eldoria.schematicsaver.commands.create.Show;
-import de.eldoria.schematicsaver.commands.create.ShowCurrentSelection;
+import de.eldoria.schematicsaver.commands.create.ShowSelection;
+import de.eldoria.schematicsaver.commands.create.ShowTemplateSelections;
 import de.eldoria.schematicsaver.commands.create.ShowType;
+import de.eldoria.schematicsaver.commands.create.ShowTypeSelections;
 import de.eldoria.schematicsaver.commands.create.ShowVariant;
+import de.eldoria.schematicsaver.commands.create.ShowVariantSelection;
 import de.eldoria.schematicsaver.config.Configuration;
 import de.eldoria.schematicsaver.services.BoundingRender;
 import org.bukkit.plugin.Plugin;
@@ -31,20 +36,25 @@ public class SchematicTemplate extends AdvancedCommand {
     public SchematicTemplate(Plugin plugin, MessageBlocker messageBlocker, BoundingRender boundingRender, Configuration configuration) {
         super(plugin, CommandMeta.builder("schematictemplate")
                 .buildSubCommands((cmds, builder) -> {
-                    var sessions = new Sessions(plugin, messageBlocker, configuration);
+                    var sessions = new Sessions(plugin, messageBlocker);
                     cmds.add(new AddType(plugin, sessions));
                     cmds.add(new AddVariant(plugin, sessions));
                     cmds.add(new Create(plugin, sessions, configuration));
                     cmds.add(new Edit(plugin, sessions, configuration));
                     cmds.add(new MessageBlock(plugin, messageBlocker));
                     cmds.add(new ModifyVariant(plugin, sessions));
+                    cmds.add(new RemoveTemplate(plugin, configuration));
                     cmds.add(new RemoveType(plugin, sessions));
                     cmds.add(new RemoveVariant(plugin, sessions));
                     cmds.add(new Save(plugin, sessions, configuration));
+                    cmds.add(new SelectVariantRegion(plugin, sessions));
                     cmds.add(new Show(plugin, sessions));
+                    cmds.add(new ShowSelection(plugin, boundingRender));
+                    cmds.add(new ShowTemplateSelections(plugin, sessions, boundingRender));
                     cmds.add(new ShowType(plugin, sessions));
+                    cmds.add(new ShowTypeSelections(plugin, sessions, boundingRender));
                     cmds.add(new ShowVariant(plugin, sessions));
-                    cmds.add(new ShowCurrentSelection(plugin, boundingRender));
+                    cmds.add(new ShowVariantSelection(plugin, sessions, boundingRender));
                 })
                 .build());
     }

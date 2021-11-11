@@ -1,50 +1,37 @@
-/*
- *     SPDX-License-Identifier: AGPL-3.0-only
- *
- *     Copyright (C) 2021 EldoriaRPG Team and Contributor
- */
-
 package de.eldoria.schematicsaver.commands.create;
 
-import com.sk89q.worldedit.WorldEdit;
 import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
 import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
 import de.eldoria.eldoutilities.simplecommands.TabCompleteUtil;
-import de.eldoria.schematicsaver.commands.util.WorldEditSelection;
+import de.eldoria.schematicsaver.services.BoundingRender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 
-public class AddVariant extends AdvancedCommand implements IPlayerTabExecutor {
+public class ShowVariantSelection extends AdvancedCommand implements IPlayerTabExecutor {
     private final Sessions sessions;
-    private final WorldEdit worldEdit = WorldEdit.getInstance();
+    private final BoundingRender render;
 
-    public AddVariant(Plugin plugin, Sessions sessions) {
-        super(plugin, CommandMeta.builder("addVariant")
-                .addUnlocalizedArgument("type_name", true)
-                .addUnlocalizedArgument("variant_name", true)
+    public ShowVariantSelection(Plugin plugin, Sessions sessions, BoundingRender render) {
+        super(plugin, CommandMeta.builder("showVariantSelection")
+                .addUnlocalizedArgument("type", true)
+                .addUnlocalizedArgument("variant", true)
                 .build());
         this.sessions = sessions;
+        this.render = render;
     }
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
         var session = sessions.getSession(player);
-        var type = session.getType(args.asString(0));
-
-        var box = WorldEditSelection.getSelectionBoundings(player);
-
-        session.assertOverlap(box, null);
-
-        var variant = type.addVariant(args.asString(1), box);
-        sessions.render(player, variant);
+        var boundings = session.getType(args.asString(0)).getVariant(args.asString(1)).boundings();
+        render.renderBox(player, boundings);
     }
 
     @Override
@@ -52,7 +39,6 @@ public class AddVariant extends AdvancedCommand implements IPlayerTabExecutor {
         if (args.size() == 1) {
             return TabCompleteUtil.complete(args.asString(0), sessions.getSession(player).typeNames());
         }
-
-        return Collections.singletonList("<variant_name>");
+        return TabCompleteUtil.complete(args.asString(1), sessions.getSession(player).getType(args.asString(0)).variantNames());
     }
 }

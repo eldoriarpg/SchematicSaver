@@ -13,6 +13,7 @@ import de.eldoria.schematicsaver.config.elements.template.Variant;
 import org.bukkit.util.BoundingBox;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -36,16 +37,19 @@ public class TypeBuilder implements Buildable<Type>, PathComponent {
         return variants.get(name.toLowerCase(Locale.ROOT));
     }
 
-    public void assertOverlap(BoundingBox box) throws CommandException {
+    public void assertOverlap(BoundingBox box, VariantBuilder variant) throws CommandException {
         for (var value : variants.values()) {
+            if (value == variant) continue;
             CommandAssertions.isFalse(value.boundings().overlaps(box), "error.regionOverlap");
         }
     }
 
     public void assertEqualSize(BoundingBox box) throws CommandException {
-        var volume = box.getVolume();
+        var widthX = box.getWidthX();
+        var widthZ = box.getWidthZ();
         for (var value : variants.values()) {
-            CommandAssertions.isTrue(value.boundings().getVolume() == volume, "error.regionSizeMissmatch");
+            CommandAssertions.isTrue(value.boundings().getWidthX() == widthX && value.boundings().getWidthZ() == widthZ
+                                     || value.boundings().getWidthX() == widthZ && value.boundings().getWidthZ() == widthX, "error.regionSizeMissmatch");
             break;
         }
     }
@@ -55,7 +59,7 @@ public class TypeBuilder implements Buildable<Type>, PathComponent {
     }
 
     public void removeVariant(String name) throws CommandException {
-       CommandAssertions.isTrue(variants.remove(name.toLowerCase(Locale.ROOT)) != null, "error.unkownVariant");
+        CommandAssertions.isTrue(variants.remove(name.toLowerCase(Locale.ROOT)) != null, "error.unkownVariant");
     }
 
     @Override
@@ -85,7 +89,12 @@ public class TypeBuilder implements Buildable<Type>, PathComponent {
         return variants.get(name.toLowerCase(Locale.ROOT));
     }
 
-    public List<BoundingBox> getBoundings(){
+    public List<BoundingBox> getBoundings() {
         return variants.values().stream().map(VariantBuilder::boundings).collect(Collectors.toList());
     }
+
+    public Collection<String> variantNames() {
+        return Collections.unmodifiableCollection(variants.keySet());
+    }
+
 }

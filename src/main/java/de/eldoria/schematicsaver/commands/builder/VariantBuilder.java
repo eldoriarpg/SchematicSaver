@@ -76,7 +76,7 @@ public class VariantBuilder implements Buildable<Variant>, PathComponent {
 
     @Override
     public String path() {
-        return type.path() + name;
+        return type.path() + " " + name;
     }
 
     public TypeBuilder type() {

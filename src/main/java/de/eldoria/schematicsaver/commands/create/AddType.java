@@ -14,6 +14,10 @@ import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
 
 public class AddType extends AdvancedCommand implements IPlayerTabExecutor {
     private final Sessions sessions;
@@ -30,5 +34,10 @@ public class AddType extends AdvancedCommand implements IPlayerTabExecutor {
         var session = sessions.getSession(player);
         var type = session.addType(args.asString(0));
         sessions.render(player, type);
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
+        return Collections.singletonList("<type>");
     }
 }

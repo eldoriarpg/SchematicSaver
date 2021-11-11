@@ -16,7 +16,7 @@ import de.eldoria.schematicsaver.commands.builder.TypeBuilder;
 import de.eldoria.schematicsaver.commands.builder.VariantBuilder;
 import de.eldoria.schematicsaver.config.Configuration;
 import de.eldoria.schematicsaver.config.elements.template.Template;
-import de.eldoria.schematicsaver.util.Colors;
+import de.eldoria.schematicsaver.util.TextColors;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
@@ -35,22 +35,20 @@ public class Sessions {
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final MessageBlocker messageBlocker;
     private final Map<UUID, TemplateBuilder> sessions = new HashMap<>();
-    private final Configuration configuration;
 
-    public Sessions(Plugin plugin, MessageBlocker messageBlocker, Configuration configuration) {
+    public Sessions(Plugin plugin, MessageBlocker messageBlocker) {
         audiences = BukkitAudiences.create(plugin);
         this.messageBlocker = messageBlocker;
-        this.configuration = configuration;
     }
 
     public TemplateBuilder create(Player player, String name) {
-        var builder = findSession(name).orElse(new TemplateBuilder(name));
+        var builder = findSession(name).orElse(new TemplateBuilder(name, player.getLocation().toVector()));
         sessions.put(player.getUniqueId(), builder);
         return builder;
     }
 
     public TemplateBuilder edit(Player player, Template template) {
-        var templateBuilder = findSession(template.name()).orElse(template.toBuilder());
+        var templateBuilder = findSession(template.name()).orElse(template.toBuilder(player.getLocation().toVector()));
         sessions.put(player.getUniqueId(), templateBuilder);
         return templateBuilder;
     }
@@ -62,58 +60,65 @@ public class Sessions {
     }
 
     public void render(Player player, TemplateBuilder template) {
+        messageBlocker.blockPlayer(player);
         var text = MessageComposer.create()
-                .text("<%s>%s%", Colors.HEADING, template.name())
+                .text("<%s>%s", TextColors.HEADING, template.name())
                 .newLine()
-                .text("<%s>Types: <%s><click:suggest_command:'/schemsave addType '>[Add]</click>", Colors.NAME, Colors.ADD)
+                .text("<%s>Types: <%s><click:suggest_command:'/schemtemp addType '>[Add]</click>", TextColors.NAME, TextColors.ADD)
+                .text(" <click:run_command:'/schemtemp showTemplateSelections'><%s>[Show Selections]</click>", TextColors.CHANGE)
                 .newLine();
         var types = template.types().stream()
-                .map(type -> String.format("  <%s>%s <%s><click:run_command:'/schemsave showType %s'>[Change]</click> <%s><click:run_command:'/schemsave removeType %s'>[Remove]</click>",
-                        Colors.NAME, type.name(), Colors.CHANGE, type.name(), Colors.REMOVE, type.name()))
+                .map(type -> String.format("  <%s>%s <%s><click:run_command:'/schemtemp showType %s'>[Change]</click> <%s><click:run_command:'/schemtemp removeType %s'>[Remove]</click>",
+                        TextColors.NAME, type.name(), TextColors.CHANGE, type.name(), TextColors.REMOVE, type.name()))
                 .collect(Collectors.toList());
         text.text(types)
                 .newLine()
-                .text("<%s><click:run_command:'schemsave save'>[Save]</click>", Colors.ADD);
-        messageBlocker.ifEnabled(() -> text.text(" <click:run_command:'/schemsave messageblock false'><%s>[x]</click>", Colors.REMOVE));
+                .text("<%s><click:run_command:'/schemtemp save'>[Save]</click>", TextColors.ADD);
+        messageBlocker.ifEnabled(() -> text.text(" <click:run_command:'/schemtemp messageblock false'><%s>[x]</click>", TextColors.REMOVE));
         messageBlocker.announce(player, "[x]");
-        audiences.player(player).sendMessage(miniMessage.parse(text.build()));
+        audiences.player(player).sendMessage(miniMessage.parse(text.prependLines(20).build()));
     }
 
     public void render(Player player, TypeBuilder type) {
+        messageBlocker.blockPlayer(player);
         var text = MessageComposer.create()
-                .text("<%s>%s%", Colors.HEADING, type.name())
+                .text("<%s>%s", TextColors.HEADING, type.name())
                 .newLine()
-                .text("<%s>Types: <%s><click:suggest_command:'/schemsave addVariant '>[Add]</click>", Colors.NAME, Colors.ADD, type.name())
+                .text("<%s>Variants: <%s><click:suggest_command:'/schemtemp addVariant %s '>[Add]</click>", TextColors.NAME, TextColors.ADD, type.name())
+                .text(" <click:run_command:'/schemtemp showTypeSelections %s'><%s>[Show Selections]</click>",type.name(), TextColors.CHANGE)
                 .newLine();
         var types = type.variants().stream()
-                .map(variant -> String.format("  <%s>%s <%s><click:run_command:'/schemsave showVariant %s %s'>[Change]</click> <%s><click:run_command:'/schemsave removeVariant %s %s'>[Remove]</click>",
-                        Colors.NAME, variant.name(), Colors.CHANGE, type.name(), variant.name(), Colors.REMOVE, type.name(), variant.name()))
+                .map(variant -> String.format("  <%s>%s <%s><click:run_command:'/schemtemp showVariant %s %s'>[Change]</click> <%s><click:run_command:'/schemtemp removeVariant %s %s'>[Remove]</click>",
+                        TextColors.NAME, variant.name(), TextColors.CHANGE, type.name(), variant.name(), TextColors.REMOVE, type.name(), variant.name()))
                 .collect(Collectors.toList());
         text.text(types)
                 .newLine()
-                .text("<%s><click:run_command:'schemsave save'>[Save]</click> <click:run_command:'/schemsave show'>[Back]</click>", Colors.ADD, Colors.CHANGE);
-        messageBlocker.ifEnabled(() -> text.text(" <click:run_command:'/schemsave messageblock false'><%s>[x]</click>", Colors.REMOVE));
+                .text("<click:run_command:'/schemtemp show'><%s>[Back]</click>", TextColors.CHANGE);
+        messageBlocker.ifEnabled(() -> text.text(" <click:run_command:'/schemtemp messageblock false'><%s>[x]</click>", TextColors.REMOVE));
         messageBlocker.announce(player, "[x]");
-        audiences.player(player).sendMessage(miniMessage.parse(text.build()));
+        audiences.player(player).sendMessage(miniMessage.parse(text.prependLines(20).build()));
     }
 
     public void render(Player player, VariantBuilder variant) {
+        messageBlocker.blockPlayer(player);
         var text = MessageComposer.create()
-                .text("<%s>%s%", Colors.HEADING, variant.name())
+                .text("<%s>%s", TextColors.HEADING, variant.name())
                 .newLine()
-                .text("<%s>Boundings:<%s> %s <%s><click:run_command:'/schemsave modifyVariant %s'>[Change]</click>",
-                        Colors.NAME, Colors.VALUE, boundingBoxToString(variant.boundings()), Colors.CHANGE, variant.path())
+                .text("<%s>Boundings", TextColors.NAME)
+                .text(" <click:run_command:'/schemtemp showVariantSelection %s'><%s>[Show]</click>",variant.path(), TextColors.CHANGE)
+                .text(" <click:run_command:'/schemtemp selectVariantRegion %s'><%s>[Select]</click>",variant.path(), TextColors.CHANGE)
+                .text(" <click:run_command:'/schemtemp modifyVariant %s selection'><%s>[Update]</click>", variant.path(), TextColors.CHANGE)
                 .newLine()
-                .text("<%s>Rotation:<%s> %s <%s><click:run_command:'/schemsave modifyVariant %s rotation'>[Change]</click>",
-                        Colors.NAME, Colors.VALUE, variant.rotation(), Colors.CHANGE, variant.path())
+                .text("<%s>Rotation:<%s> %s <%s><click:suggest_command:'/schemtemp modifyVariant %s rotation '>[Change]</click>",
+                        TextColors.NAME, TextColors.VALUE, variant.rotation(), TextColors.CHANGE, variant.path())
                 .newLine()
-                .text("<%s>Flip:<%s> %s <%s><click:run_command:'/schemsave modifyVariant %s flip'>[Change]</click>",
-                        Colors.NAME, Colors.VALUE, flipToString(variant.flip()), Colors.CHANGE, variant.path())
+                .text("<%s>Flip:<%s> %s <%s><click:suggest_command:'/schemtemp modifyVariant %s flip '>[Change]</click>",
+                        TextColors.NAME, TextColors.VALUE, flipToString(variant.flip()), TextColors.CHANGE, variant.path())
                 .newLine()
-                .text("<%s><click:run_command:'/schemsave showType %s'>[Back]</click>", Colors.ADD, Colors.CHANGE, variant.type().name());
-        messageBlocker.ifEnabled(() -> text.text(" <click:run_command:'/schemsave messageblock false'><%s>[x]</click>", Colors.REMOVE));
+                .text("<%s><click:run_command:'/schemtemp showType %s'>[Back]</click>", TextColors.CHANGE, variant.type().name());
+        messageBlocker.ifEnabled(() -> text.text(" <click:run_command:'/schemtemp messageblock false'><%s>[x]</click>", TextColors.REMOVE));
         messageBlocker.announce(player, "[x]");
-        audiences.player(player).sendMessage(miniMessage.parse(text.build()));
+        audiences.player(player).sendMessage(miniMessage.parse(text.prependLines(20).build()));
     }
 
     private String boundingBoxToString(BoundingBox box) {

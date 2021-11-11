@@ -9,8 +9,11 @@ package de.eldoria.schematicsaver.config.elements.template;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import de.eldoria.schematicsaver.commands.builder.TemplateBuilder;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -46,9 +49,13 @@ public class Template implements ConfigurationSerializable {
         return name;
     }
 
-    public TemplateBuilder toBuilder() {
-        var templateBuilder = new TemplateBuilder(name);
+    public TemplateBuilder toBuilder(Vector vector) {
+        var templateBuilder = new TemplateBuilder(name, vector);
         types.values().forEach(templateBuilder::addType);
         return templateBuilder;
+    }
+
+    public Collection<String> typeNames(){
+        return Collections.unmodifiableCollection(types.keySet());
     }
 }

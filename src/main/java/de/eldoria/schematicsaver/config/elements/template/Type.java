@@ -12,6 +12,8 @@ import de.eldoria.schematicsaver.commands.builder.TypeBuilder;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -51,5 +53,9 @@ public class Type implements ConfigurationSerializable {
         var typeBuilder = new TypeBuilder(template, name);
         variants.values().forEach(typeBuilder::addVariant);
         return typeBuilder;
+    }
+
+    public Collection<String> variantNames(){
+        return Collections.unmodifiableCollection(variants.keySet());
     }
 }

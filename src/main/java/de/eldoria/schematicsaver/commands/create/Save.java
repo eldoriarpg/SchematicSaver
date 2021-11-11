@@ -34,6 +34,7 @@ public class Save extends AdvancedCommand implements IPlayerTabExecutor {
         var session = sessions.getSession(player);
         var build = session.build();
         configuration.templateRegistry().addTemplate(build);
+        configuration.save();
         sessions.close(player);
     }
 }

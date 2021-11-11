@@ -6,15 +6,18 @@
 
 package de.eldoria.schematicsaver.config.elements;
 
+import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
+import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import de.eldoria.schematicsaver.config.elements.template.Template;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
 public class TemplateRegistry implements ConfigurationSerializable {
     private final Map<String, Template> templates;
@@ -37,11 +40,24 @@ public class TemplateRegistry implements ConfigurationSerializable {
     }
 
 
-    public Optional<Template> getTemplate(String name) {
-        return Optional.ofNullable(templates.get(name.toLowerCase(Locale.ROOT)));
+    public Template getTemplate(String name) throws CommandException {
+        CommandAssertions.isTrue(templates.containsKey(name.toLowerCase(Locale.ROOT)), "error.unkownTemplate");
+        return templates.get(name.toLowerCase(Locale.ROOT));
+    }
+    public boolean templateExists(String name) throws CommandException {
+        return templates.containsKey(name.toLowerCase(Locale.ROOT));
     }
 
     public void addTemplate(Template template) {
         templates.put(template.name().toLowerCase(Locale.ROOT), template);
+    }
+
+    public Collection<String> templateNames() {
+        return Collections.unmodifiableCollection(templates.keySet());
+    }
+
+    public void removeTemplate(String name) throws CommandException {
+        getTemplate(name);
+        templates.remove(name.toLowerCase(Locale.ROOT));
     }
 }

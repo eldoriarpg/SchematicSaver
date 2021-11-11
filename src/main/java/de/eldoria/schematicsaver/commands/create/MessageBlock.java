@@ -38,9 +38,4 @@ public class MessageBlock extends AdvancedCommand implements IPlayerTabExecutor 
             messageBlocker.unblockPlayer(player);
         }
     }
-
-    @Override
-    public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        return IPlayerTabExecutor.super.onTabComplete(player, alias, args);
-    }
 }
