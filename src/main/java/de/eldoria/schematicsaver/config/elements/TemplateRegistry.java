@@ -8,34 +8,45 @@ package de.eldoria.schematicsaver.config.elements;
 
 import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
+import de.eldoria.eldoutilities.serialization.NamingStrategy;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
+import de.eldoria.schematicsaver.config.elements.template.Namespace;
 import de.eldoria.schematicsaver.config.elements.template.Template;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public class TemplateRegistry implements ConfigurationSerializable {
-    private final Map<String, Template> templates;
+    private final Map<String, Template> templates = new HashMap<>();
+    private final Map<String, Namespace> namespaces = new HashMap<>();
 
     public TemplateRegistry(Map<String, Object> objectMap) {
         var map = SerializationUtil.mapOf(objectMap);
-        templates = map.getMap("templates", (key, val) -> key);
+        List<Template> templates = map.getValue("templates");
+        templates.forEach(template -> {
+            this.templates.put(template.name().toLowerCase(Locale.ROOT), template);
+        });
+        List<Namespace> namespaces = map.getValue("namespaces");
+        namespaces.forEach(namespace -> {
+            this.namespaces.put(namespace.name().toLowerCase(Locale.ROOT), namespace);
+        });
     }
 
     public TemplateRegistry() {
-        templates = new HashMap<>();
     }
-
     @Override
     @NotNull
     public Map<String, Object> serialize() {
         return SerializationUtil.newBuilder()
-                .addMap("templates", templates, (key, val) -> key)
+                .add("templates",new ArrayList<>(templates.values()))
+                .add("namespaces", new ArrayList<>(namespaces.values()))
                 .build();
     }
 
@@ -44,6 +55,7 @@ public class TemplateRegistry implements ConfigurationSerializable {
         CommandAssertions.isTrue(templates.containsKey(name.toLowerCase(Locale.ROOT)), "error.unkownTemplate");
         return templates.get(name.toLowerCase(Locale.ROOT));
     }
+
     public boolean templateExists(String name) throws CommandException {
         return templates.containsKey(name.toLowerCase(Locale.ROOT));
     }
@@ -54,6 +66,26 @@ public class TemplateRegistry implements ConfigurationSerializable {
 
     public Collection<String> templateNames() {
         return Collections.unmodifiableCollection(templates.keySet());
+    }
+
+    public Collection<String> namespaceNames() {
+        return Collections.unmodifiableSet(namespaces.keySet());
+    }
+
+    public void addNamespace(String name, String template) throws CommandException {
+        if(namespaces.containsKey(name)){
+            throw CommandException.message("error.namespaceUsed");
+        }
+        namespaces.put(name.toLowerCase(Locale.ROOT), new Namespace(name, getTemplate(template).name()));
+    }
+
+    public Namespace getNamespace(String name) throws CommandException {
+        CommandAssertions.isTrue(namespaces.containsKey(name.toLowerCase(Locale.ROOT)), "error.unkownNamespace");
+        return namespaces.get(name.toLowerCase(Locale.ROOT));
+    }
+
+    public boolean isUsed(Template template){
+        return namespaces.values().stream().anyMatch(namespace -> namespace.template().equalsIgnoreCase(template.name()));
     }
 
     public void removeTemplate(String name) throws CommandException {

@@ -4,31 +4,28 @@
  *     Copyright (C) 2021 EldoriaRPG Team and Contributor
  */
 
-package de.eldoria.schematicsaver.commands.create;
+package de.eldoria.schematicsaver.commands.template;
 
 import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
 import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
-import de.eldoria.schematicsaver.commands.util.WorldEditSelection;
-import de.eldoria.schematicsaver.services.BoundingRender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public class ShowSelection extends AdvancedCommand implements IPlayerTabExecutor {
-    private final BoundingRender boundingRender;
+public class Show extends AdvancedCommand implements IPlayerTabExecutor {
+    private final Sessions sessions;
 
-    public ShowSelection(Plugin plugin, BoundingRender boundingRender) {
-        super(plugin, CommandMeta.builder("showCurrentSelection")
+    public Show(Plugin plugin, Sessions sessions) {
+        super(plugin, CommandMeta.builder("show")
                 .build());
-        this.boundingRender = boundingRender;
+        this.sessions = sessions;
     }
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        var selectionBoundings = WorldEditSelection.getSelectionBoundings(player);
-        boundingRender.renderBox(player, selectionBoundings);
+        sessions.render(player, sessions.getSession(player));
     }
 }

@@ -4,17 +4,16 @@
  *     Copyright (C) 2021 EldoriaRPG Team and Contributor
  */
 
-package de.eldoria.schematicsaver.commands.create;
+package de.eldoria.schematicsaver.commands.template;
 
 import com.sk89q.worldedit.util.Direction;
 import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.localization.MessageComposer;
 import de.eldoria.messageblocker.blocker.MessageBlocker;
-import de.eldoria.schematicsaver.commands.builder.TemplateBuilder;
-import de.eldoria.schematicsaver.commands.builder.TypeBuilder;
-import de.eldoria.schematicsaver.commands.builder.VariantBuilder;
-import de.eldoria.schematicsaver.config.Configuration;
+import de.eldoria.schematicsaver.commands.template.builder.TemplateBuilder;
+import de.eldoria.schematicsaver.commands.template.builder.TypeBuilder;
+import de.eldoria.schematicsaver.commands.template.builder.VariantBuilder;
 import de.eldoria.schematicsaver.config.elements.template.Template;
 import de.eldoria.schematicsaver.util.TextColors;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -65,7 +64,7 @@ public class Sessions {
                 .text("<%s>%s", TextColors.HEADING, template.name())
                 .newLine()
                 .text("<%s>Types: <%s><click:suggest_command:'/schemtemp addType '>[Add]</click>", TextColors.NAME, TextColors.ADD)
-                .text(" <click:run_command:'/schemtemp showTemplateSelections'><%s>[Show Selections]</click>", TextColors.CHANGE)
+                .text(" <click:run_command:'/schemtemp renderTemplateSelections'><%s>[Show Selections]</click>", TextColors.CHANGE)
                 .newLine();
         var types = template.types().stream()
                 .map(type -> String.format("  <%s>%s <%s><click:run_command:'/schemtemp showType %s'>[Change]</click> <%s><click:run_command:'/schemtemp removeType %s'>[Remove]</click>",
@@ -85,7 +84,7 @@ public class Sessions {
                 .text("<%s>%s", TextColors.HEADING, type.name())
                 .newLine()
                 .text("<%s>Variants: <%s><click:suggest_command:'/schemtemp addVariant %s '>[Add]</click>", TextColors.NAME, TextColors.ADD, type.name())
-                .text(" <click:run_command:'/schemtemp showTypeSelections %s'><%s>[Show Selections]</click>",type.name(), TextColors.CHANGE)
+                .text(" <click:run_command:'/schemtemp renderTypeSelections %s'><%s>[Show Selections]</click>",type.name(), TextColors.CHANGE)
                 .newLine();
         var types = type.variants().stream()
                 .map(variant -> String.format("  <%s>%s <%s><click:run_command:'/schemtemp showVariant %s %s'>[Change]</click> <%s><click:run_command:'/schemtemp removeVariant %s %s'>[Remove]</click>",
@@ -105,7 +104,7 @@ public class Sessions {
                 .text("<%s>%s", TextColors.HEADING, variant.name())
                 .newLine()
                 .text("<%s>Boundings", TextColors.NAME)
-                .text(" <click:run_command:'/schemtemp showVariantSelection %s'><%s>[Show]</click>",variant.path(), TextColors.CHANGE)
+                .text(" <click:run_command:'/schemtemp renderVariantSelection %s'><%s>[Show]</click>",variant.path(), TextColors.CHANGE)
                 .text(" <click:run_command:'/schemtemp selectVariantRegion %s'><%s>[Select]</click>",variant.path(), TextColors.CHANGE)
                 .text(" <click:run_command:'/schemtemp modifyVariant %s selection'><%s>[Update]</click>", variant.path(), TextColors.CHANGE)
                 .newLine()

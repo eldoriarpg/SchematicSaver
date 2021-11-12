@@ -8,19 +8,22 @@ package de.eldoria.schematicsaver.config.elements.template;
 
 import com.sk89q.worldedit.util.Direction;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
-import de.eldoria.schematicsaver.commands.builder.TypeBuilder;
-import de.eldoria.schematicsaver.commands.builder.VariantBuilder;
+import de.eldoria.schematicsaver.commands.template.builder.TypeBuilder;
+import de.eldoria.schematicsaver.commands.template.builder.VariantBuilder;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public class Variant implements ConfigurationSerializable {
+public class Variant implements ConfigurationSerializable, Comparable<Variant> {
     private final String name;
     private final int rotation;
     private final Direction flip;
     private final BoundingBox boundings;
+    private Type parent;
 
     public Variant(Map<String, Object> objectMap) {
         var map = SerializationUtil.mapOf(objectMap);
@@ -41,6 +44,9 @@ public class Variant implements ConfigurationSerializable {
                 .build();
     }
 
+    void link(Type parent) {
+        this.parent = parent;
+    }
 
     public Variant(String name, int rotation, Direction flip, BoundingBox boundings) {
         this.name = name;
@@ -67,5 +73,38 @@ public class Variant implements ConfigurationSerializable {
 
     public VariantBuilder toBuilder(TypeBuilder typeBuilder) {
         return new VariantBuilder(typeBuilder, name, rotation, flip, boundings.clone().shift(typeBuilder.template().origin()));
+    }
+
+    public BoundingBox relative(Player player) {
+        var origin = player.getLocation();
+        return boundings.clone().shift(new Vector(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ()));
+    }
+
+    public int getMaxWidth() {
+        return (int) Math.round(Math.max(boundings.getWidthZ(), boundings.getWidthX()));
+    }
+
+    public Type parent() {
+        return parent;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Variant)) return false;
+
+        var variant = (Variant) o;
+
+        return name.equals(variant.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public int compareTo(@NotNull Variant o) {
+        return name.compareTo(o.name);
     }
 }

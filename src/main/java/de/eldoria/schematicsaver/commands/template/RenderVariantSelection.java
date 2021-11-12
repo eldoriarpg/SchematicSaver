@@ -4,7 +4,7 @@
  *     Copyright (C) 2021 EldoriaRPG Team and Contributor
  */
 
-package de.eldoria.schematicsaver.commands.create;
+package de.eldoria.schematicsaver.commands.template;
 
 import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
 import de.eldoria.eldoutilities.commands.command.CommandMeta;
@@ -15,19 +15,19 @@ import de.eldoria.eldoutilities.simplecommands.TabCompleteUtil;
 import de.eldoria.schematicsaver.services.BoundingRender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ShowTypeSelections extends AdvancedCommand implements IPlayerTabExecutor {
+public class RenderVariantSelection extends AdvancedCommand implements IPlayerTabExecutor {
     private final Sessions sessions;
     private final BoundingRender render;
 
-    public ShowTypeSelections(Plugin plugin, Sessions sessions, BoundingRender render) {
-        super(plugin, CommandMeta.builder("showTypeSelections")
+    public RenderVariantSelection(Plugin plugin, Sessions sessions, BoundingRender render) {
+        super(plugin, CommandMeta.builder("renderVariantSelection")
                 .addUnlocalizedArgument("type", true)
+                .addUnlocalizedArgument("variant", true)
                 .build());
         this.sessions = sessions;
         this.render = render;
@@ -35,15 +35,17 @@ public class ShowTypeSelections extends AdvancedCommand implements IPlayerTabExe
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
+        render.clearPlayer(player);
         var session = sessions.getSession(player);
-        var boundings = session.getType(args.asString(0)).getBoundings();
-        for (var bounding : boundings) {
-            render.renderBox(player, bounding);
-        }
+        var boundings = session.getType(args.asString(0)).getVariant(args.asString(1)).boundings();
+        render.renderBox(player, boundings);
     }
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        return TabCompleteUtil.complete(args.asString(0), sessions.getSession(player).typeNames());
+        if (args.size() == 1) {
+            return TabCompleteUtil.complete(args.asString(0), sessions.getSession(player).typeNames());
+        }
+        return TabCompleteUtil.complete(args.asString(1), sessions.getSession(player).getType(args.asString(0)).variantNames());
     }
 }

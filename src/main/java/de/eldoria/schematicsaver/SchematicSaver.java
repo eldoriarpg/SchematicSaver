@@ -10,9 +10,11 @@ import de.eldoria.eldoutilities.localization.ILocalizer;
 import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.plugin.EldoPlugin;
 import de.eldoria.messageblocker.MessageBlockerAPI;
+import de.eldoria.schematicsaver.commands.SchematicExport;
 import de.eldoria.schematicsaver.commands.SchematicTemplate;
 import de.eldoria.schematicsaver.config.Configuration;
 import de.eldoria.schematicsaver.config.elements.TemplateRegistry;
+import de.eldoria.schematicsaver.config.elements.template.Namespace;
 import de.eldoria.schematicsaver.config.elements.template.Template;
 import de.eldoria.schematicsaver.config.elements.template.Type;
 import de.eldoria.schematicsaver.config.elements.template.Variant;
@@ -31,14 +33,20 @@ public class SchematicSaver extends EldoPlugin {
 
         var configuration = new Configuration(this);
         var boundingRender = new BoundingRender(this);
-        getScheduler().runTaskTimerAsynchronously(this, boundingRender, 5, 5);
+        boundingRender.schedule(5);
 
-        var messageBlocker = MessageBlockerAPI.builder(this).addWhitelisted("[SS]").build();
+        var messageBlocker = MessageBlockerAPI.builder(this)
+                .addWhitelisted("[SS]")
+                .addWhitelisted("FAWE")
+                .addWhitelisted("First position")
+                .addWhitelisted("Second position")
+                .build();
         registerCommand(new SchematicTemplate(this, messageBlocker, boundingRender, configuration));
+        registerCommand(new SchematicExport(this, configuration, boundingRender));
     }
 
     @Override
     public List<Class<? extends ConfigurationSerializable>> getConfigSerialization() {
-        return List.of(Template.class, Type.class, Variant.class, TemplateRegistry.class);
+        return List.of(Template.class, Type.class, Variant.class, TemplateRegistry.class, Namespace.class);
     }
 }

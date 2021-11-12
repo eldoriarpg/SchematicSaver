@@ -4,8 +4,8 @@
  *     Copyright (C) 2021 EldoriaRPG Team and Contributor
  */
 
-package de.eldoria.schematicsaver.commands.builder;
+package de.eldoria.schematicsaver.commands.template.builder;
 
-public interface PathComponent {
-    String path();
+public interface Buildable<T> {
+    T build();
 }

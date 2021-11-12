@@ -4,38 +4,32 @@
  *     Copyright (C) 2021 EldoriaRPG Team and Contributor
  */
 
-package de.eldoria.schematicsaver.commands.create;
+package de.eldoria.schematicsaver.commands.template;
 
 import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
 import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
-import de.eldoria.messageblocker.blocker.MessageBlocker;
+import de.eldoria.schematicsaver.commands.util.WorldEditSelection;
+import de.eldoria.schematicsaver.services.BoundingRender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+public class RenderCurrentSelection extends AdvancedCommand implements IPlayerTabExecutor {
+    private final BoundingRender boundingRender;
 
-public class MessageBlock extends AdvancedCommand implements IPlayerTabExecutor {
-    private final MessageBlocker messageBlocker;
-
-    public MessageBlock(Plugin plugin, MessageBlocker messageBlocker) {
-        super(plugin, CommandMeta.builder("messageBlock")
-                .addUnlocalizedArgument("state", true)
-                .hidden()
+    public RenderCurrentSelection(Plugin plugin, BoundingRender boundingRender) {
+        super(plugin, CommandMeta.builder("renderCurrentSelection")
                 .build());
-        this.messageBlocker = messageBlocker;
+        this.boundingRender = boundingRender;
     }
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        if (args.asBoolean(0)) {
-            messageBlocker.blockPlayer(player);
-        } else {
-            messageBlocker.unblockPlayer(player);
-        }
+        var selectionBoundings = WorldEditSelection.getSelectionBoundings(player);
+        boundingRender.clearPlayer(player);
+        boundingRender.renderBox(player, selectionBoundings);
     }
 }

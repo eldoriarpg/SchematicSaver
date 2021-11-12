@@ -4,37 +4,40 @@
  *     Copyright (C) 2021 EldoriaRPG Team and Contributor
  */
 
-package de.eldoria.schematicsaver.commands.create;
+package de.eldoria.schematicsaver.commands.template;
 
 import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
 import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
-import de.eldoria.schematicsaver.commands.builder.TemplateBuilder;
-import de.eldoria.schematicsaver.config.Configuration;
-import de.eldoria.schematicsaver.config.elements.template.Template;
+import de.eldoria.eldoutilities.simplecommands.TabCompleteUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class Save extends AdvancedCommand implements IPlayerTabExecutor {
+import java.util.List;
+
+public class RemoveType extends AdvancedCommand implements IPlayerTabExecutor {
     private final Sessions sessions;
-    private final Configuration configuration;
 
-    public Save(Plugin plugin, Sessions sessions, Configuration configuration) {
-        super(plugin, CommandMeta.builder("save")
+    public RemoveType(Plugin plugin, Sessions sessions) {
+        super(plugin, CommandMeta.builder("removeType")
+                .addUnlocalizedArgument("type_name", true)
                 .build());
         this.sessions = sessions;
-        this.configuration = configuration;
     }
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
         var session = sessions.getSession(player);
-        var build = session.build();
-        configuration.templateRegistry().addTemplate(build);
-        configuration.save();
-        sessions.close(player);
+        session.removeType(args.asString(0));
+        sessions.render(player, session);
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
+        return TabCompleteUtil.complete(args.asString(0), sessions.getSession(player).typeNames());
     }
 }

@@ -18,10 +18,10 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc", "spigot-api", "1.13.2-R0.1-SNAPSHOT")
-    compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.3.0-SNAPSHOT")
+    compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.7-SNAPSHOT")
     compileOnly("org.jetbrains", "annotations", "20.1.0")
 
-    implementation("de.eldoria", "eldo-util", "1.12.1-DEV")
+    implementation("de.eldoria", "eldo-util", "1.12.2-DEV")
 
     implementation("de.eldoria", "messageblocker", "1.1.0")
     implementation("net.kyori", "adventure-platform-bukkit", "4.0.0")
@@ -41,6 +41,7 @@ java {
 license {
     header(rootProject.file("HEADER.txt"))
     include("**/*.java")
+    exclude("**/ClipboardTransformBaker.java")
 }
 
 tasks {
@@ -60,7 +61,7 @@ tasks {
     }
 
     shadowJar {
-        relocate("de.eldoria.eldoutilities", shadebase + "eldoutilities")
+        //relocate("de.eldoria.eldoutilities", shadebase + "eldoutilities")
         relocate("net.kyori", shadebase + "kyori")
         mergeServiceFiles()
     }

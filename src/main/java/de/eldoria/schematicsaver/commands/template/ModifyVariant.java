@@ -4,7 +4,7 @@
  *     Copyright (C) 2021 EldoriaRPG Team and Contributor
  */
 
-package de.eldoria.schematicsaver.commands.create;
+package de.eldoria.schematicsaver.commands.template;
 
 import com.sk89q.worldedit.util.Direction;
 import de.eldoria.eldoutilities.commands.command.AdvancedCommand;

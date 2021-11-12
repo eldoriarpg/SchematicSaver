@@ -22,14 +22,21 @@ import java.util.Queue;
 import java.util.UUID;
 
 public class BoundingRender implements Runnable {
-
+    private static final double MIN_OFFSET = -0.05;
+    private static final double MAX_OFFSET = 1.05;
     private final Plugin plugin;
     private final Queue<Color> colors = new ArrayDeque<>();
     private final Map<UUID, List<RenderTask>> tasks = new HashMap<>();
+    private int refreshRate;
 
     public BoundingRender(Plugin plugin) {
         this.plugin = plugin;
         buildColors();
+    }
+
+    public void schedule(int refreshRate) {
+        this.refreshRate = refreshRate;
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this, 5, refreshRate);
     }
 
     private void buildColors() {
@@ -45,66 +52,45 @@ public class BoundingRender implements Runnable {
         }
     }
 
-    private void highlightBoundings(Player player, BoundingBox box) {
+    private void highlightBoundings(Player player, BoundingBox box, int seconds) {
         var max = box.getMax();
         var min = box.getMin();
 
         // upper corners
-        var u1 = getVector(min, max, min);
-        var u2 = getVector(min, max, max);
-        var u3 = getVector(max, max, max);
-        var u4 = getVector(max, max, min);
+        var u1 = getVector(min, max, min).add(new Vector(MIN_OFFSET, MAX_OFFSET, MIN_OFFSET));
+        var u2 = getVector(min, max, max).add(new Vector(MIN_OFFSET, MAX_OFFSET, MAX_OFFSET));
+        var u3 = getVector(max, max, max).add(new Vector(MAX_OFFSET, MAX_OFFSET, MAX_OFFSET));
+        var u4 = getVector(max, max, min).add(new Vector(MAX_OFFSET, MAX_OFFSET, MIN_OFFSET));
 
         // lower corners
-        var l1 = getVector(min, min, min);
-        var l2 = getVector(min, min, max);
-        var l3 = getVector(max, min, max);
-        var l4 = getVector(max, min, min);
+        var l1 = getVector(min, min, min).add(new Vector(MIN_OFFSET, MIN_OFFSET, MIN_OFFSET));
+        var l2 = getVector(min, min, max).add(new Vector(MIN_OFFSET, MIN_OFFSET, MAX_OFFSET));
+        var l3 = getVector(max, min, max).add(new Vector(MAX_OFFSET, MIN_OFFSET, MAX_OFFSET));
+        var l4 = getVector(max, min, min).add(new Vector(MAX_OFFSET, MIN_OFFSET, MIN_OFFSET));
 
-        var color = getNextColor();
+        var task = new RenderTask(seconds * (20 / refreshRate), getNextColor());
 
-        addCircle(player, color, u1, u2, u3, u4);
-        addCircle(player, color, l1, l2, l3, l4);
+        task.addCircle(u1, u2, u3, u4);
+        task.addCircle(l1, l2, l3, l4);
 
-        addTask(player, l1, u1, color);
-        addTask(player, l2, u2, color);
-        addTask(player, l3, u3, color);
-        addTask(player, l4, u4, color);
+        task.addTask(l1, u1);
+        task.addTask(l2, u2);
+        task.addTask(l3, u3);
+        task.addTask(l4, u4);
 
         // cross implementation
-        addTask(player, u1, u3, color);
-        addTask(player, u2, u4, color);
+        task.addCross(u1, u3, u2, u4);
+        task.addCross(l1, l3, l2, l4);
+        task.addCross(u1, l4, u4, l1);
+        task.addCross(u1, l2, u2, l1);
+        task.addCross(u2, l3, u3, l2);
+        task.addCross(u3, l4, u4, l3);
 
-        addTask(player, l1, l3, color);
-        addTask(player, l2, l4, color);
-
-        addTask(player, u1, l4, color);
-        addTask(player, u4, l1, color);
-
-        addTask(player, u1, l2, color);
-        addTask(player, u2, l1, color);
-
-        addTask(player, u2, l3, color);
-        addTask(player, u3, l2, color);
-
-        addTask(player, u3, l4, color);
-        addTask(player, u4, l3, color);
-    }
-
-    private void addCircle(Player player, Color color, Vector vec1, Vector vec2, Vector vec3, Vector vec4) {
-        addTask(player, vec1, vec2, color);
-        addTask(player, vec2, vec3, color);
-        addTask(player, vec3, vec4, color);
-        addTask(player, vec4, vec1, color);
-    }
-
-    private void addTask(Player player, Vector origin, Vector direction, Color color) {
-        tasks.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>()).add(RenderTask.of(origin, direction, color, 40));
+        tasks.computeIfAbsent(player.getUniqueId(), k -> new ArrayList<>()).add(task);
     }
 
     private Vector getVector(Vector x, Vector y, Vector z) {
-        return new Vector(x.getBlockX(), y.getBlockY(), z.getBlockZ())
-                .add(new Vector(0.5, 0.5, 0.5));
+        return new Vector(x.getBlockX(), y.getBlockY(), z.getBlockZ());
     }
 
     private Color getNextColor() {
@@ -114,7 +100,15 @@ public class BoundingRender implements Runnable {
     }
 
     public void renderBox(Player player, BoundingBox box) {
-        highlightBoundings(player, box);
+        renderBox(player, box, 10);
+    }
+
+    public void renderBox(Player player, BoundingBox box, int seconds) {
+        highlightBoundings(player, box, seconds);
+    }
+
+    public void clearPlayer(Player player) {
+        tasks.remove(player.getUniqueId());
     }
 
     @Override
@@ -133,35 +127,64 @@ public class BoundingRender implements Runnable {
     }
 
     private static class RenderTask {
-        private final Vector origin;
-        private final int steps;
-        private final Vector step;
-        private final Color color;
         private int duration;
+        private final Color color;
+        private final List<RenderSubTask> subTasks = new ArrayList<>();
 
-        private RenderTask(Vector origin, int duration, int steps, Vector step, Color color) {
-            this.origin = origin;
+        private RenderTask(int duration, Color color) {
             this.duration = duration;
-            this.steps = steps;
-            this.step = step;
             this.color = color;
-        }
-
-        private static RenderTask of(Vector origin, Vector target, Color color, int duration) {
-            var direction = target.clone().subtract(origin);
-            var steps = (int) (direction.length() / 0.5);
-            var step = direction.normalize().multiply(0.5);
-            return new RenderTask(origin, duration, steps, step, color);
         }
 
         public boolean draw(Player player) {
             duration--;
+            for (var subTask : subTasks) {
+                subTask.draw(player, color);
+            }
+            return duration <= 0;
+        }
+
+        public void addTask(Vector origin, Vector direction) {
+            subTasks.add(RenderSubTask.of(origin, direction));
+        }
+
+        private void addCircle(Vector vec1, Vector vec2, Vector vec3, Vector vec4) {
+            addTask(vec1, vec2);
+            addTask(vec2, vec3);
+            addTask(vec3, vec4);
+            addTask(vec4, vec1);
+        }
+
+        private void addCross(Vector vec1, Vector vec2, Vector vec3, Vector vec4) {
+            addTask(vec1, vec2);
+            addTask(vec4, vec3);
+        }
+    }
+
+    private static class RenderSubTask {
+        private final Vector origin;
+        private final int steps;
+        private final Vector step;
+
+        private RenderSubTask(Vector origin, int steps, Vector step) {
+            this.origin = origin;
+            this.steps = steps;
+            this.step = step;
+        }
+
+        private static RenderSubTask of(Vector origin, Vector target) {
+            var direction = target.clone().subtract(origin);
+            var steps = (int) (direction.length() / 0.5);
+            var step = direction.normalize().multiply(0.5);
+            return new RenderSubTask(origin, steps, step);
+        }
+
+        public void draw(Player player, Color color) {
             var loc = origin.clone();
             for (var i = 0; i < steps; i++) {
                 player.spawnParticle(Particle.REDSTONE, loc.getX(), loc.getY(), loc.getZ(), 0, new Particle.DustOptions(color, 1));
                 loc.add(step);
             }
-            return duration <= 0;
         }
     }
 }
