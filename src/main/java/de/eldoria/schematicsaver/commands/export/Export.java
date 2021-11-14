@@ -19,10 +19,12 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
 import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.command.util.Arguments;
+import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
 import de.eldoria.eldoutilities.simplecommands.TabCompleteUtil;
 import de.eldoria.schematicsaver.config.Configuration;
+import de.eldoria.schematicsaver.util.Permissions;
 import de.eldoria.schematicsaver.worldedit.ClipboardTransformBaker;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -47,6 +49,7 @@ public class Export extends AdvancedCommand implements IPlayerTabExecutor {
         super(plugin, CommandMeta.builder("export")
                 .addUnlocalizedArgument("namespace", true)
                 .addUnlocalizedArgument("id", false)
+                .withPermission(Permissions.SchematicExport.EXPORT)
                 .build());
         this.configuration = configuration;
     }
@@ -67,8 +70,14 @@ public class Export extends AdvancedCommand implements IPlayerTabExecutor {
         try {
             Files.createDirectories(schematics);
         } catch (IOException e) {
-            plugin().getLogger().log(Level.SEVERE, "Coult not create schematic directory", e);
+            plugin().getLogger().log(Level.SEVERE, "Could not create schematic directory", e);
             return;
+        }
+
+        var allowOverride = args.flags().has("f");
+
+        if (allowOverride) {
+            CommandAssertions.permission(player, false, Permissions.SchematicExport.Export.OVERRIDE);
         }
 
         for (var variant : template.variants()) {
@@ -90,6 +99,11 @@ public class Export extends AdvancedCommand implements IPlayerTabExecutor {
                 clipboard = ClipboardTransformBaker.bakeTransform(clipboard, transform);
 
                 var schemFile = schematics.resolve(Path.of(String.format("%s.%s.%s.%s.schem", namespace.name(), nextid, variant.parent().name(), variant.name()))).toFile();
+
+                if (schemFile.exists() && !allowOverride) {
+                    throw CommandException.message("error.schematicExists");
+                }
+
                 try (var writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(schemFile))) {
                     writer.write(clipboard);
                 }

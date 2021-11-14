@@ -27,6 +27,7 @@ import de.eldoria.schematicsaver.config.Configuration;
 import de.eldoria.schematicsaver.config.elements.template.Template;
 import de.eldoria.schematicsaver.config.elements.template.Type;
 import de.eldoria.schematicsaver.config.elements.template.Variant;
+import de.eldoria.schematicsaver.util.Permissions;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -52,6 +53,7 @@ public class Paste extends AdvancedCommand implements IPlayerTabExecutor {
         super(plugin, CommandMeta.builder("paste")
                 .addUnlocalizedArgument("namespace", true)
                 .addUnlocalizedArgument("id", false)
+                .withPermission(Permissions.SchematicExport.PASTE)
                 .build());
         this.configuration = configuration;
     }

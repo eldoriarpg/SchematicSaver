@@ -6,6 +6,8 @@
 
 package de.eldoria.schematicsaver.config.elements.template;
 
+import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
+import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import de.eldoria.schematicsaver.commands.template.builder.TemplateBuilder;
 import de.eldoria.schematicsaver.commands.template.builder.TypeBuilder;
@@ -86,8 +88,13 @@ public class Type implements ConfigurationSerializable, Comparable<Type> {
         return parent;
     }
 
-    public Variant getVariant(String variant) {
+    public Variant findVariant(String variant) {
         return variants.get(variant.toLowerCase(Locale.ROOT));
+    }
+
+    public Variant getVariant(String name) throws CommandException {
+        CommandAssertions.isTrue(variants.containsKey(name.toLowerCase(Locale.ROOT)), "error.unkownVariant");
+        return variants.get(name.toLowerCase(Locale.ROOT));
     }
 
     @Override

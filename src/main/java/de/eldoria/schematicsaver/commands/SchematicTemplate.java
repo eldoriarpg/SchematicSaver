@@ -33,6 +33,7 @@ import de.eldoria.schematicsaver.commands.template.ShowType;
 import de.eldoria.schematicsaver.commands.template.ShowVariant;
 import de.eldoria.schematicsaver.config.Configuration;
 import de.eldoria.schematicsaver.services.BoundingRenderer;
+import de.eldoria.schematicsaver.util.Permissions;
 import org.bukkit.plugin.Plugin;
 
 public class SchematicTemplate extends AdvancedCommand {
@@ -62,6 +63,7 @@ public class SchematicTemplate extends AdvancedCommand {
                     cmds.add(new ShowType(plugin, sessions));
                     cmds.add(new ShowVariant(plugin, sessions));
                 })
+                .withPermission(Permissions.SchematicTemplate.CREATE, Permissions.SchematicTemplate.EDIT)
                 .build());
     }
 }

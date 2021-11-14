@@ -6,6 +6,8 @@
 
 package de.eldoria.schematicsaver.config.elements.template;
 
+import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
+import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import de.eldoria.schematicsaver.commands.template.builder.TemplateBuilder;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -96,8 +98,13 @@ public class Template implements ConfigurationSerializable {
             if (type == null) {
                 return null;
             }
-            return type.getVariant(matcher.group("variant"));
+            return type.findVariant(matcher.group("variant"));
         }
         return null;
+    }
+
+    public Type getType(String name) throws CommandException {
+        CommandAssertions.isTrue(types.containsKey(name.toLowerCase(Locale.ROOT)), "error.unkownType");
+        return types.get(name.toLowerCase(Locale.ROOT));
     }
 }

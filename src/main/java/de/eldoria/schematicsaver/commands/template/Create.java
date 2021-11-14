@@ -13,6 +13,7 @@ import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
 import de.eldoria.schematicsaver.config.Configuration;
+import de.eldoria.schematicsaver.util.Permissions;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,7 @@ public class Create extends AdvancedCommand implements IPlayerTabExecutor {
     public Create(Plugin plugin, Sessions sessions, Configuration configuration) {
         super(plugin, CommandMeta.builder("create")
                 .addUnlocalizedArgument("name", true)
+                .withPermission(Permissions.SchematicTemplate.CREATE)
                 .build());
         this.sessions = sessions;
         this.configuration = configuration;
