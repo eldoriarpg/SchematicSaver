@@ -18,7 +18,7 @@ import de.eldoria.schematicsaver.config.elements.template.Namespace;
 import de.eldoria.schematicsaver.config.elements.template.Template;
 import de.eldoria.schematicsaver.config.elements.template.Type;
 import de.eldoria.schematicsaver.config.elements.template.Variant;
-import de.eldoria.schematicsaver.services.BoundingRender;
+import de.eldoria.schematicsaver.services.BoundingRenderer;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import java.util.List;
@@ -32,8 +32,7 @@ public class SchematicSaver extends EldoPlugin {
         MessageSender.create(this, "[SS]");
 
         var configuration = new Configuration(this);
-        var boundingRender = new BoundingRender(this);
-        boundingRender.schedule(5);
+        var boundingRender = BoundingRenderer.create(this, 5);
 
         var messageBlocker = MessageBlockerAPI.builder(this)
                 .addWhitelisted("[SS]")

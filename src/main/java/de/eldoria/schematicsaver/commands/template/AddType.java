@@ -38,6 +38,9 @@ public class AddType extends AdvancedCommand implements IPlayerTabExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        return Collections.singletonList("<type>");
+        if (args.sizeIs(1)) {
+            return Collections.singletonList("<type>");
+        }
+        return Collections.emptyList();
     }
 }

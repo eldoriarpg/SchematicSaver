@@ -42,6 +42,9 @@ public class Create extends AdvancedCommand implements IPlayerTabExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        return Collections.singletonList("template_name");
+        if (args.sizeIs(1)) {
+            return Collections.singletonList("template_name");
+        }
+        return Collections.emptyList();
     }
 }

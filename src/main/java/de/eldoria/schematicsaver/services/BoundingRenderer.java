@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 
-public class BoundingRender implements Runnable {
+public class BoundingRenderer implements Runnable {
     private static final double MIN_OFFSET = -0.05;
     private static final double MAX_OFFSET = 1.05;
     private final Plugin plugin;
@@ -29,12 +29,18 @@ public class BoundingRender implements Runnable {
     private final Map<UUID, List<RenderTask>> tasks = new HashMap<>();
     private int refreshRate;
 
-    public BoundingRender(Plugin plugin) {
-        this.plugin = plugin;
-        buildColors();
+    public static BoundingRenderer create(Plugin plugin, int refreshRate) {
+        var render = new BoundingRenderer(plugin);
+        render.buildColors();
+        render.schedule(refreshRate);
+        return render;
     }
 
-    public void schedule(int refreshRate) {
+    private BoundingRenderer(Plugin plugin) {
+        this.plugin = plugin;
+    }
+
+    private void schedule(int refreshRate) {
         this.refreshRate = refreshRate;
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this, 5, refreshRate);
     }

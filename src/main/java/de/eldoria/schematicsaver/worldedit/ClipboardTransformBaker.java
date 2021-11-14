@@ -43,8 +43,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @see Transform
  * @deprecated This class will be included into WorldEdit 7.3.0. Remove when released.
  */
-@SuppressWarnings("DeprecatedIsStillUsed")
-@Deprecated(forRemoval = true)
+@SuppressWarnings("ALL")
+@Deprecated
 public class ClipboardTransformBaker {
 
     private final Clipboard original;

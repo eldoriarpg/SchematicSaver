@@ -8,8 +8,10 @@ package de.eldoria.schematicsaver.commands.template.builder;
 
 import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
+import de.eldoria.eldoutilities.localization.MessageComposer;
 import de.eldoria.schematicsaver.config.elements.template.Template;
 import de.eldoria.schematicsaver.config.elements.template.Type;
+import de.eldoria.schematicsaver.util.TextColors;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -28,13 +30,13 @@ public class TemplateBuilder implements Buildable<Template> {
     private Vector origin;
     private Map<String, TypeBuilder> types = new LinkedHashMap<>();
 
-    public String name() {
-        return name;
-    }
-
     public TemplateBuilder(String name, Vector origin) {
         this.name = name;
         this.origin = new Vector(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
+    }
+
+    public String name() {
+        return name;
     }
 
     public TypeBuilder addType(String name) throws CommandException {
@@ -43,7 +45,7 @@ public class TemplateBuilder implements Buildable<Template> {
         return types.get(name.toLowerCase(Locale.ROOT));
     }
 
-    public void removeType(String name) throws CommandException{
+    public void removeType(String name) throws CommandException {
         CommandAssertions.isTrue(types.remove(name.toLowerCase(Locale.ROOT)) != null, "error.unkownType");
     }
 
@@ -77,14 +79,38 @@ public class TemplateBuilder implements Buildable<Template> {
     }
 
     public void origin(Vector origin) {
-        this.origin = origin;
+        this.origin = new Vector(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
     }
 
-    public List<BoundingBox> getBoundings(){
+    public List<BoundingBox> getBoundings() {
         return types.values().stream().flatMap(typeBuilder -> typeBuilder.getBoundings().stream()).collect(Collectors.toList());
     }
 
     public Collection<String> typeNames() {
         return Collections.unmodifiableCollection(types.keySet());
+    }
+
+    public MessageComposer asComponent() {
+        var text = MessageComposer.create()
+                .text("<%s>%s", TextColors.HEADING, name())
+                .newLine()
+                .text("<%s>Origin: <%s>%s",
+                        TextColors.NAME, TextColors.VALUE, origin())
+                .space()
+                .text("<click:run_command:'/schemtemp renderOrigin'><%s>[Show]</click>", TextColors.CHANGE)
+                .space()
+                .text("<click:run_command:'/schemtemp modifyTemplate origin'><%s>[Update]</click>", TextColors.CHANGE)
+                .newLine()
+                .text("<%s>Types: <%s><click:suggest_command:'/schemtemp addType '>[Add]</click>", TextColors.NAME, TextColors.ADD)
+                .text(" <click:run_command:'/schemtemp renderTemplateSelections'><%s>[Show Selections]</click>", TextColors.CHANGE)
+                .newLine();
+        var types = types().stream()
+                .map(type -> String.format("  <%s>%s <%s><click:run_command:'/schemtemp showType %s'>[Change]</click> <%s><click:run_command:'/schemtemp removeType %s'>[Remove]</click>",
+                        TextColors.NAME, type.name(), TextColors.CHANGE, type.name(), TextColors.REMOVE, type.name()))
+                .collect(Collectors.toList());
+        text.text(types)
+                .newLine()
+                .text("<%s><click:run_command:'/schemtemp save'>[Save]</click>", TextColors.ADD);
+        return text;
     }
 }

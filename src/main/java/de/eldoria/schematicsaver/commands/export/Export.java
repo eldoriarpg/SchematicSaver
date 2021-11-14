@@ -35,6 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -57,13 +58,11 @@ public class Export extends AdvancedCommand implements IPlayerTabExecutor {
 
         var schematics = plugin().getDataFolder().toPath().resolve(Path.of("schematics"));
 
-        int nextid;
-        if (args.size() == 1) {
-            nextid = namespace.getNextid();
+        var nextid = args.asInt(1, () -> {
+            var id = namespace.getNextid();
             configuration.save();
-        } else {
-            nextid = args.asInt(1);
-        }
+            return id;
+        });
 
         try {
             Files.createDirectories(schematics);
@@ -84,6 +83,8 @@ public class Export extends AdvancedCommand implements IPlayerTabExecutor {
                 var transform = new AffineTransform();
                 transform = transform.rotateY(variant.rotation());
                 if (variant.flip() != null) {
+                    // dont know why adding and multiplying is needed, but it breaks when its not there... (2019)
+                    // It really breaks... (2021)
                     transform = transform.scale(variant.flip().toVector().abs().multiply(-2.0).add(1.0, 1.0, 1.0));
                 }
                 clipboard = ClipboardTransformBaker.bakeTransform(clipboard, transform);
@@ -100,7 +101,7 @@ public class Export extends AdvancedCommand implements IPlayerTabExecutor {
                 plugin().getLogger().log(Level.SEVERE, "Could not write player schematic.", e);
             }
         }
-        messageSender().sendMessage(player, "Export done.");
+        messageSender().sendMessage(player, "Export done. Saved with id " + nextid + ".");
     }
 
     private CuboidRegion convert(Player player, BoundingBox box) {
@@ -112,6 +113,10 @@ public class Export extends AdvancedCommand implements IPlayerTabExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        return TabCompleteUtil.complete(args.asString(0), configuration.templateRegistry().namespaceNames());
+        return switch (args.size()) {
+            case 1 -> TabCompleteUtil.complete(args.asString(0), configuration.templateRegistry().namespaceNames());
+            case 2 -> Collections.singletonList("[id]");
+            default -> Collections.emptyList();
+        };
     }
 }

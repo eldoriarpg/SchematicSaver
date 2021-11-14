@@ -58,24 +58,16 @@ public class ModifyVariant extends AdvancedCommand implements IPlayerTabExecutor
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        if (args.size() == 1) {
-            return TabCompleteUtil.complete(args.asString(0), sessions.getSession(player).typeNames());
-        }
-        if (args.size() == 2) {
-            return TabCompleteUtil.complete(args.asString(1), sessions.getSession(player).getType(args.asString(0)).variantNames());
-        }
-        if (args.size() == 3) {
-            return TabCompleteUtil.complete(args.asString(2), "selection", "rotation", "flip");
-        }
-        if ("selection".equalsIgnoreCase(args.asString(2))) {
-            return Collections.emptyList();
-        }
-        if ("rotation".equalsIgnoreCase(args.asString(2))) {
-            return TabCompleteUtil.complete(args.asString(3), "0", "90", "180", "270");
-        }
-        if ("flip".equalsIgnoreCase(args.asString(2))) {
-            return TabCompleteUtil.complete(args.asString(3), Direction.class);
-        }
-        return Collections.emptyList();
+        return switch (args.size()) {
+            case 1 -> TabCompleteUtil.complete(args.asString(0), sessions.getSession(player).typeNames());
+            case 2 -> TabCompleteUtil.complete(args.asString(1), sessions.getSession(player).getType(args.asString(0)).variantNames());
+            case 3 -> TabCompleteUtil.complete(args.asString(2), "selection", "rotation", "flip");
+            case 4 -> switch (args.asString(2).toLowerCase(Locale.ROOT)) {
+                case "rotation" -> TabCompleteUtil.complete(args.asString(3), "0", "90", "180", "270");
+                case "flip" -> TabCompleteUtil.complete(args.asString(3), Direction.class);
+                default -> Collections.emptyList();
+            };
+            default -> Collections.emptyList();
+        };
     }
 }

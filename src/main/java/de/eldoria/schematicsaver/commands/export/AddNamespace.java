@@ -21,11 +21,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-public class RegisterNamespace extends AdvancedCommand implements IPlayerTabExecutor {
+public class AddNamespace extends AdvancedCommand implements IPlayerTabExecutor {
     private final Configuration configuration;
 
-    public RegisterNamespace(Plugin plugin, Configuration configuration) {
-        super(plugin, CommandMeta.builder("registerNamespace")
+    public AddNamespace(Plugin plugin, Configuration configuration) {
+        super(plugin, CommandMeta.builder("addNamespace")
                 .addUnlocalizedArgument("namespace", true)
                 .addUnlocalizedArgument("template", true)
                 .build());
@@ -41,9 +41,10 @@ public class RegisterNamespace extends AdvancedCommand implements IPlayerTabExec
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        if (args.size() == 1) {
-            return Collections.singletonList("<namespace>");
-        }
-        return TabCompleteUtil.complete(args.asString(1), configuration.templateRegistry().templateNames());
+        return switch (args.size()) {
+            case 1 -> Collections.singletonList("<namespace>");
+            case 2 -> TabCompleteUtil.complete(args.asString(1), configuration.templateRegistry().templateNames());
+            default -> Collections.emptyList();
+        };
     }
 }

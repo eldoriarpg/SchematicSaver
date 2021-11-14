@@ -8,8 +8,10 @@ package de.eldoria.schematicsaver.commands.template.builder;
 
 import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
+import de.eldoria.eldoutilities.localization.MessageComposer;
 import de.eldoria.schematicsaver.config.elements.template.Type;
 import de.eldoria.schematicsaver.config.elements.template.Variant;
+import de.eldoria.schematicsaver.util.TextColors;
 import org.bukkit.util.BoundingBox;
 
 import java.util.Collection;
@@ -97,4 +99,20 @@ public class TypeBuilder implements Buildable<Type>, PathComponent {
         return Collections.unmodifiableCollection(variants.keySet());
     }
 
+    public MessageComposer asComponent() {
+        var text = MessageComposer.create()
+                .text("<%s>%s", TextColors.HEADING, name())
+                .newLine()
+                .text("<%s>Variants: <%s><click:suggest_command:'/schemtemp addVariant %s '>[Add]</click>", TextColors.NAME, TextColors.ADD, name())
+                .text(" <click:run_command:'/schemtemp renderTypeSelections %s'><%s>[Show Selections]</click>", name(), TextColors.CHANGE)
+                .newLine();
+        var types = variants().stream()
+                .map(variant -> String.format("  <%s>%s <%s><click:run_command:'/schemtemp showVariant %s %s'>[Change]</click> <%s><click:run_command:'/schemtemp removeVariant %s %s'>[Remove]</click>",
+                        TextColors.NAME, variant.name(), TextColors.CHANGE, name(), variant.name(), TextColors.REMOVE, name(), variant.name()))
+                .collect(Collectors.toList());
+        text.text(types)
+                .newLine()
+                .text("<click:run_command:'/schemtemp show'><%s>[Back]</click>", TextColors.CHANGE);
+        return text;
+    }
 }

@@ -8,7 +8,6 @@ package de.eldoria.schematicsaver.config.elements;
 
 import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
-import de.eldoria.eldoutilities.serialization.NamingStrategy;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import de.eldoria.schematicsaver.config.elements.template.Namespace;
 import de.eldoria.schematicsaver.config.elements.template.Template;
@@ -91,5 +90,9 @@ public class TemplateRegistry implements ConfigurationSerializable {
     public void removeTemplate(String name) throws CommandException {
         getTemplate(name);
         templates.remove(name.toLowerCase(Locale.ROOT));
+    }
+
+    public boolean removeNamespace(String name) {
+        return namespaces.remove(name.toLowerCase(Locale.ROOT)) != null;
     }
 }

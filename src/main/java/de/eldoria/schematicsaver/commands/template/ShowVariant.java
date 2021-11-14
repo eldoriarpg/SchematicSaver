@@ -17,6 +17,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ShowVariant extends AdvancedCommand implements IPlayerTabExecutor {
@@ -37,9 +38,10 @@ public class ShowVariant extends AdvancedCommand implements IPlayerTabExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        if (args.size() == 1) {
-            return TabCompleteUtil.complete(args.asString(0), sessions.getSession(player).typeNames());
-        }
-        return TabCompleteUtil.complete(args.asString(1), sessions.getSession(player).getType(args.asString(0)).variantNames());
+        return switch (args.size()) {
+            case 1 -> TabCompleteUtil.complete(args.asString(0), sessions.getSession(player).typeNames());
+            case 2 -> TabCompleteUtil.complete(args.asString(1), sessions.getSession(player).getType(args.asString(0)).variantNames());
+            default -> Collections.emptyList();
+        };
     }
 }

@@ -17,6 +17,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 public class RemoveType extends AdvancedCommand implements IPlayerTabExecutor {
@@ -38,6 +39,9 @@ public class RemoveType extends AdvancedCommand implements IPlayerTabExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        return TabCompleteUtil.complete(args.asString(0), sessions.getSession(player).typeNames());
+        if (args.sizeIs(1)) {
+            return TabCompleteUtil.complete(args.asString(0), sessions.getSession(player).typeNames());
+        }
+        return Collections.emptyList();
     }
 }
