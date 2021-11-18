@@ -40,11 +40,12 @@ public class TemplateRegistry implements ConfigurationSerializable {
 
     public TemplateRegistry() {
     }
+
     @Override
     @NotNull
     public Map<String, Object> serialize() {
         return SerializationUtil.newBuilder()
-                .add("templates",new ArrayList<>(templates.values()))
+                .add("templates", new ArrayList<>(templates.values()))
                 .add("namespaces", new ArrayList<>(namespaces.values()))
                 .build();
     }
@@ -72,7 +73,7 @@ public class TemplateRegistry implements ConfigurationSerializable {
     }
 
     public void addNamespace(String name, String template) throws CommandException {
-        if(namespaces.containsKey(name)){
+        if (namespaces.containsKey(name)) {
             throw CommandException.message("error.namespaceUsed");
         }
         namespaces.put(name.toLowerCase(Locale.ROOT), new Namespace(name, getTemplate(template).name()));
@@ -83,7 +84,7 @@ public class TemplateRegistry implements ConfigurationSerializable {
         return namespaces.get(name.toLowerCase(Locale.ROOT));
     }
 
-    public boolean isUsed(Template template){
+    public boolean isUsed(Template template) {
         return namespaces.values().stream().anyMatch(namespace -> namespace.template().equalsIgnoreCase(template.name()));
     }
 

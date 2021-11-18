@@ -32,10 +32,11 @@ public class RenderOrigin extends AdvancedCommand implements IPlayerTabExecutor 
 
     @Override
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
+        render.clearPlayer(player);
         var session = sessions.getSession(player);
 
         var top = session.origin().clone().add(new Vector(0, 1, 0));
         var box = BoundingBox.of(session.origin(), top);
-        render.renderBox(player, box, args.asInt(0, 10));
+        render.renderBox(player, box, args.asInt(0, -1));
     }
 }

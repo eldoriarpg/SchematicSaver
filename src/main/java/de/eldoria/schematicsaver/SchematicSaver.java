@@ -12,7 +12,10 @@ import de.eldoria.eldoutilities.plugin.EldoPlugin;
 import de.eldoria.messageblocker.MessageBlockerAPI;
 import de.eldoria.schematicsaver.commands.SchematicExport;
 import de.eldoria.schematicsaver.commands.SchematicTemplate;
+import de.eldoria.schematicsaver.commands.template.Sessions;
 import de.eldoria.schematicsaver.config.Configuration;
+import de.eldoria.schematicsaver.config.elements.PasteSettings;
+import de.eldoria.schematicsaver.config.elements.RenderSettings;
 import de.eldoria.schematicsaver.config.elements.TemplateRegistry;
 import de.eldoria.schematicsaver.config.elements.template.Namespace;
 import de.eldoria.schematicsaver.config.elements.template.Template;
@@ -32,7 +35,6 @@ public class SchematicSaver extends EldoPlugin {
         MessageSender.create(this, "[SS]");
 
         var configuration = new Configuration(this);
-        var boundingRender = BoundingRenderer.create(this, 5);
 
         var messageBlocker = MessageBlockerAPI.builder(this)
                 .addWhitelisted("[SS]")
@@ -40,12 +42,15 @@ public class SchematicSaver extends EldoPlugin {
                 .addWhitelisted("First position")
                 .addWhitelisted("Second position")
                 .build();
-        registerCommand(new SchematicTemplate(this, messageBlocker, boundingRender, configuration));
+        var sessions = new Sessions(this, messageBlocker);
+        var boundingRender = BoundingRenderer.create(this, configuration, sessions);
+        registerCommand(new SchematicTemplate(this, sessions, messageBlocker, boundingRender, configuration));
         registerCommand(new SchematicExport(this, configuration, boundingRender));
     }
 
     @Override
     public List<Class<? extends ConfigurationSerializable>> getConfigSerialization() {
-        return List.of(Template.class, Type.class, Variant.class, TemplateRegistry.class, Namespace.class);
+        return List.of(Template.class, Type.class, Variant.class, TemplateRegistry.class, Namespace.class,
+                PasteSettings.class, RenderSettings.class);
     }
 }

@@ -24,6 +24,7 @@ import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
 import de.eldoria.eldoutilities.simplecommands.TabCompleteUtil;
 import de.eldoria.schematicsaver.config.Configuration;
+import de.eldoria.schematicsaver.config.elements.PasteSettings;
 import de.eldoria.schematicsaver.config.elements.template.Template;
 import de.eldoria.schematicsaver.config.elements.template.Type;
 import de.eldoria.schematicsaver.config.elements.template.Variant;
@@ -40,7 +41,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -89,25 +89,26 @@ public class Paste extends AdvancedCommand implements IPlayerTabExecutor {
         var groupType = args.flags()
                 .getIfPresent("g")
                 .or(() -> args.flags().getIfPresent("grouping"))
-                .map(Input::asString)
-                .orElse("types");
+                .orElse(Input.of(plugin(), configuration.pasteSettings().pasteGrouping().name()))
+                .asEnum(PasteSettings.PasteGrouping.class);
+
 
         var optRowOffset = args.flags().getIfPresent("r");
-        var rowOffset = optRowOffset.isPresent() ? optRowOffset.get().asInt() : 1;
+        var rowOffset = optRowOffset.isPresent() ? optRowOffset.get().asInt() : configuration.pasteSettings().rowOffset();
 
         var optColOffset = args.flags().getIfPresent("c");
-        var colOffset = optColOffset.isPresent() ? optColOffset.get().asInt() : 1;
+        var colOffset = optColOffset.isPresent() ? optColOffset.get().asInt() : configuration.pasteSettings().columnOffset();
 
         var optMultiOffset = args.flags().getIfPresent("m");
-        var multiOffset = optMultiOffset.isPresent() ? optMultiOffset.get().asInt() - rowOffset : 2;
+        var multiOffset = (optMultiOffset.isPresent() ? optMultiOffset.get().asInt() : configuration.pasteSettings().multiOffset()) - rowOffset;
 
 
         var localSession = WorldEdit.getInstance().getSessionManager().get(actor);
         var session = WorldEdit.getInstance().newEditSessionBuilder().world(actor.getWorld()).actor(actor).build();
         try (session) {
-            switch (groupType.toLowerCase(Locale.ROOT)) {
-                case "types" -> pasteTypesGrouped(collect, template, player, session, colOffset, rowOffset);
-                case "id" -> pasteTypesAndIdsGrouped(collect, template, player, session, colOffset, rowOffset, multiOffset);
+            switch (groupType) {
+                case TYPES -> pasteTypesGrouped(collect, template, player, session, colOffset, rowOffset);
+                case ID -> pasteTypesAndIdsGrouped(collect, template, player, session, colOffset, rowOffset, multiOffset);
                 default -> throw CommandException.message("Invalid paste grouping. Use types or id");
             }
         } catch (WorldEditException e) {

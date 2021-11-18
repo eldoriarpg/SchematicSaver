@@ -44,7 +44,7 @@ public class Edit extends AdvancedCommand implements IPlayerTabExecutor {
             throw CommandException.message("error.usedTeamplate");
         }
 
-        if(args.flags().has("f")){
+        if (args.flags().has("f")) {
             CommandAssertions.permission(player, false, Permissions.SchematicTemplate.Edit.OVERRIDE);
         }
 

@@ -39,7 +39,7 @@ public class RenderVariantSelection extends AdvancedCommand implements IPlayerTa
         render.clearPlayer(player);
         var session = sessions.getSession(player);
         var boundings = session.getType(args.asString(0)).getVariant(args.asString(1)).boundings();
-        render.renderBox(player, boundings, args.asInt(0, 10));
+        render.renderBox(player, boundings, args.asInt(2, -1));
     }
 
     @Override

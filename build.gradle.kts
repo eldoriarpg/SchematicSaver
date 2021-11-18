@@ -1,7 +1,7 @@
 plugins {
     id("org.cadixdev.licenser") version "0.6.1"
     id("com.github.johnrengelman.shadow") version "7.1.0"
-    id("de.chojo.publishdata") version "1.0.1"
+    id("de.chojo.publishdata") version "1.0.2"
     java
     `maven-publish`
 }
@@ -72,7 +72,7 @@ tasks {
         from(sourceSets.main.get().resources.srcDirs) {
             filesMatching("plugin.yml") {
                 expand(
-                    "version" to project.version
+                    "version" to publishData.getVersion(true)
                 )
             }
             duplicatesStrategy = DuplicatesStrategy.INCLUDE
@@ -91,6 +91,7 @@ tasks {
 }
 
 publishData {
+    hashLength = 7
     useEldoNexusRepos()
     publishTask("jar")
     publishTask("shadowJar")

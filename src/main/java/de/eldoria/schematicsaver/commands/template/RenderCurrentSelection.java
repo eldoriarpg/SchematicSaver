@@ -35,7 +35,7 @@ public class RenderCurrentSelection extends AdvancedCommand implements IPlayerTa
     public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
         var selectionBoundings = WorldEditSelection.getSelectionBoundings(player);
         boundingRenderer.clearPlayer(player);
-        boundingRenderer.renderBox(player, selectionBoundings, args.asInt(0, 10));
+        boundingRenderer.renderBox(player, selectionBoundings, args.asInt(0, -1));
     }
 
     @Override

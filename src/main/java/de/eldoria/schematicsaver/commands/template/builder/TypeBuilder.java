@@ -9,6 +9,7 @@ package de.eldoria.schematicsaver.commands.template.builder;
 import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.localization.MessageComposer;
+import de.eldoria.schematicsaver.commands.util.Verifier;
 import de.eldoria.schematicsaver.config.elements.template.Type;
 import de.eldoria.schematicsaver.config.elements.template.Variant;
 import de.eldoria.schematicsaver.util.TextColors;
@@ -24,8 +25,8 @@ import java.util.stream.Collectors;
 
 public class TypeBuilder implements Buildable<Type>, PathComponent {
     private final TemplateBuilder template;
-    private String name;
-    private Map<String, VariantBuilder> variants = new LinkedHashMap<>();
+    private final String name;
+    private final Map<String, VariantBuilder> variants = new LinkedHashMap<>();
 
     public TypeBuilder(TemplateBuilder template, String name) {
         this.template = template;
@@ -33,6 +34,7 @@ public class TypeBuilder implements Buildable<Type>, PathComponent {
     }
 
     public VariantBuilder addVariant(String name, BoundingBox box) throws CommandException {
+        Verifier.checkName(name);
         CommandAssertions.isFalse(variants.containsKey(name.toLowerCase(Locale.ROOT)), "error.typeExists");
         assertEqualSize(box);
         variants.computeIfAbsent(name.toLowerCase(Locale.ROOT), k -> new VariantBuilder(this, name, box));

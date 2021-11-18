@@ -12,6 +12,7 @@ import de.eldoria.messageblocker.blocker.MessageBlocker;
 import de.eldoria.schematicsaver.commands.template.builder.TemplateBuilder;
 import de.eldoria.schematicsaver.commands.template.builder.TypeBuilder;
 import de.eldoria.schematicsaver.commands.template.builder.VariantBuilder;
+import de.eldoria.schematicsaver.commands.util.Verifier;
 import de.eldoria.schematicsaver.config.elements.template.Template;
 import de.eldoria.schematicsaver.util.TextColors;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -35,7 +36,8 @@ public class Sessions {
         this.messageBlocker = messageBlocker;
     }
 
-    public TemplateBuilder create(Player player, String name) {
+    public TemplateBuilder create(Player player, String name) throws CommandException {
+        Verifier.checkName(name);
         var builder = findSession(name).orElse(new TemplateBuilder(name, player.getLocation().toVector()));
         sessions.put(player.getUniqueId(), builder);
         return builder;
@@ -87,5 +89,9 @@ public class Sessions {
     public void close(Player player) {
         sessions.remove(player.getUniqueId());
         messageBlocker.unblockPlayer(player);
+    }
+
+    public boolean hasSession(Player player) {
+        return sessions.containsKey(player.getUniqueId());
     }
 }

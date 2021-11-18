@@ -53,7 +53,7 @@ public class ClipboardTransformBaker {
     /**
      * Create a new instance.
      *
-     * @param original the original clipboard
+     * @param original  the original clipboard
      * @param transform the transform
      */
     private ClipboardTransformBaker(Clipboard original, Transform transform) {
@@ -61,6 +61,26 @@ public class ClipboardTransformBaker {
         checkNotNull(transform);
         this.original = original;
         this.transform = transform;
+    }
+
+    /**
+     * Create a new instance to bake the transform with.
+     *
+     * @param original  the original clipboard
+     * @param transform the transform
+     * @return a builder
+     * @throws WorldEditException if an error occurred during copy
+     */
+    public static Clipboard bakeTransform(Clipboard original, Transform transform) throws WorldEditException {
+        if (transform.isIdentity()) {
+            return original;
+        }
+        ClipboardTransformBaker baker = new ClipboardTransformBaker(original, transform);
+        Clipboard target = new BlockArrayClipboard(baker.getTransformedRegion());
+        target.setOrigin(original.getOrigin());
+        Operations.complete(baker.copyTo(target));
+
+        return target;
     }
 
     /**
@@ -79,7 +99,7 @@ public class ClipboardTransformBaker {
                         transform,
                         new AffineTransform().translate(original.getOrigin()));
 
-        Vector3[] corners = new Vector3[] {
+        Vector3[] corners = new Vector3[]{
                 minimum,
                 maximum,
                 minimum.withX(maximum.getX()),
@@ -124,26 +144,6 @@ public class ClipboardTransformBaker {
             copy.setCopyingBiomes(true);
         }
         return copy;
-    }
-
-    /**
-     * Create a new instance to bake the transform with.
-     *
-     * @param original the original clipboard
-     * @param transform the transform
-     * @return a builder
-     * @throws WorldEditException if an error occurred during copy
-     */
-    public static Clipboard bakeTransform(Clipboard original, Transform transform) throws WorldEditException {
-        if (transform.isIdentity()) {
-            return original;
-        }
-        ClipboardTransformBaker baker = new ClipboardTransformBaker(original, transform);
-        Clipboard target = new BlockArrayClipboard(baker.getTransformedRegion());
-        target.setOrigin(original.getOrigin());
-        Operations.complete(baker.copyTo(target));
-
-        return target;
     }
 
 }

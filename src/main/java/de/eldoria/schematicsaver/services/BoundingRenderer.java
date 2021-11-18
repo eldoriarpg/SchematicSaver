@@ -6,9 +6,21 @@
 
 package de.eldoria.schematicsaver.services;
 
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.command.tool.SelectionWand;
+import de.eldoria.eldoutilities.commands.exceptions.CommandException;
+import de.eldoria.schematicsaver.commands.template.Sessions;
+import de.eldoria.schematicsaver.commands.util.WorldEditSelection;
+import de.eldoria.schematicsaver.config.Configuration;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -21,23 +33,53 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 
-public class BoundingRenderer implements Runnable {
+public class BoundingRenderer implements Runnable, Listener {
     private static final double MIN_OFFSET = -0.05;
     private static final double MAX_OFFSET = 1.05;
     private final Plugin plugin;
+    private final Configuration configuration;
+    private final Sessions sessions;
     private final Queue<Color> colors = new ArrayDeque<>();
     private final Map<UUID, List<RenderTask>> tasks = new HashMap<>();
+    private final Map<UUID, BoundingBox> lastRender = new HashMap<>();
     private int refreshRate;
 
-    public static BoundingRenderer create(Plugin plugin, int refreshRate) {
-        var render = new BoundingRenderer(plugin);
+    private BoundingRenderer(Plugin plugin, Configuration configuration, Sessions sessions) {
+        this.plugin = plugin;
+        this.configuration = configuration;
+        this.sessions = sessions;
+    }
+
+    public static BoundingRenderer create(Plugin plugin, Configuration configuration, Sessions sessions) {
+        var render = new BoundingRenderer(plugin, configuration, sessions);
         render.buildColors();
-        render.schedule(refreshRate);
+        render.schedule(configuration.renderSettings().refreshRate());
+        plugin.getServer().getPluginManager().registerEvents(render, plugin);
         return render;
     }
 
-    private BoundingRenderer(Plugin plugin) {
-        this.plugin = plugin;
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onInteract(PlayerInteractEvent event) {
+        var player = event.getPlayer();
+        if (!sessions.hasSession(player)) return;
+        if (event.getAction() != Action.LEFT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+
+        var session = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(player));
+        var type = player.getInventory().getItemInMainHand().getType();
+        if (!(session.getTool(BukkitAdapter.asItemType(type)) instanceof SelectionWand)) {
+            return;
+        }
+
+        BoundingBox box;
+        try {
+            box = WorldEditSelection.getSelectionBoundings(player);
+        } catch (CommandException e) {
+            // discard
+            return;
+        }
+
+        clearPlayer(player);
+        renderBox(player, box);
     }
 
     private void schedule(int refreshRate) {
@@ -106,11 +148,15 @@ public class BoundingRenderer implements Runnable {
     }
 
     public void renderBox(Player player, BoundingBox box) {
-        renderBox(player, box, 10);
+        renderBox(player, box, configuration.renderSettings().displayTime());
     }
 
     public void renderBox(Player player, BoundingBox box, int seconds) {
-        highlightBoundings(player, box, seconds);
+        if (box.getVolume() > configuration.renderSettings().maxRegionVolume()) return;
+        if (seconds == -1) {
+            seconds = configuration.renderSettings().displayTime();
+        }
+        highlightBoundings(player, box, Math.min(configuration.renderSettings().maxDisplayTime(), seconds));
     }
 
     public void clearPlayer(Player player) {
@@ -133,9 +179,9 @@ public class BoundingRenderer implements Runnable {
     }
 
     private static class RenderTask {
-        private int duration;
         private final Color color;
         private final List<RenderSubTask> subTasks = new ArrayList<>();
+        private int duration;
 
         private RenderTask(int duration, Color color) {
             this.duration = duration;

@@ -33,6 +33,13 @@ public class Variant implements ConfigurationSerializable, Comparable<Variant> {
         boundings = map.getValue("boundings");
     }
 
+    public Variant(String name, int rotation, Direction flip, BoundingBox boundings) {
+        this.name = name;
+        this.rotation = rotation;
+        this.flip = flip;
+        this.boundings = boundings;
+    }
+
     @Override
     @NotNull
     public Map<String, Object> serialize() {
@@ -46,13 +53,6 @@ public class Variant implements ConfigurationSerializable, Comparable<Variant> {
 
     void link(Type parent) {
         this.parent = parent;
-    }
-
-    public Variant(String name, int rotation, Direction flip, BoundingBox boundings) {
-        this.name = name;
-        this.rotation = rotation;
-        this.flip = flip;
-        this.boundings = boundings;
     }
 
     public String name() {

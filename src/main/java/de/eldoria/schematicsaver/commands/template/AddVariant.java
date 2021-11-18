@@ -6,7 +6,6 @@
 
 package de.eldoria.schematicsaver.commands.template;
 
-import com.sk89q.worldedit.WorldEdit;
 import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
 import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.command.util.Arguments;
@@ -14,6 +13,7 @@ import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
 import de.eldoria.eldoutilities.simplecommands.TabCompleteUtil;
 import de.eldoria.schematicsaver.commands.util.WorldEditSelection;
+import de.eldoria.schematicsaver.services.BoundingRenderer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -24,14 +24,15 @@ import java.util.List;
 
 public class AddVariant extends AdvancedCommand implements IPlayerTabExecutor {
     private final Sessions sessions;
-    private final WorldEdit worldEdit = WorldEdit.getInstance();
+    private final BoundingRenderer boundingRenderer;
 
-    public AddVariant(Plugin plugin, Sessions sessions) {
+    public AddVariant(Plugin plugin, Sessions sessions, BoundingRenderer boundingRenderer) {
         super(plugin, CommandMeta.builder("addVariant")
                 .addUnlocalizedArgument("type_name", true)
                 .addUnlocalizedArgument("variant_name", true)
                 .build());
         this.sessions = sessions;
+        this.boundingRenderer = boundingRenderer;
     }
 
     @Override
@@ -40,10 +41,12 @@ public class AddVariant extends AdvancedCommand implements IPlayerTabExecutor {
         var type = session.getType(args.asString(0));
 
         var box = WorldEditSelection.getSelectionBoundings(player);
-
-        session.assertOverlap(box, null);
+        if (!args.flags().has("f")) {
+            session.assertOverlap(box, null);
+        }
 
         var variant = type.addVariant(args.asString(1), box);
+        boundingRenderer.renderBox(player, box);
         sessions.render(player, variant);
     }
 

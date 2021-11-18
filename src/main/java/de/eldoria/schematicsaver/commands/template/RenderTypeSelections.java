@@ -40,7 +40,7 @@ public class RenderTypeSelections extends AdvancedCommand implements IPlayerTabE
         var session = sessions.getSession(player);
         var boundings = session.getType(args.asString(0)).getBoundings();
         for (var bounding : boundings) {
-            render.renderBox(player, bounding, args.asInt(0,10));
+            render.renderBox(player, bounding, args.asInt(1, -1));
         }
     }
 

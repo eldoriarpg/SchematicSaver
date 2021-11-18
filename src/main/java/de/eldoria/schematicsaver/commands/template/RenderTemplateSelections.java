@@ -38,7 +38,7 @@ public class RenderTemplateSelections extends AdvancedCommand implements IPlayer
         var session = sessions.getSession(player);
         var boundings = session.getBoundings();
         for (var bounding : boundings) {
-            render.renderBox(player, bounding, args.asInt(0,10));
+            render.renderBox(player, bounding, args.asInt(0, -1));
         }
     }
 

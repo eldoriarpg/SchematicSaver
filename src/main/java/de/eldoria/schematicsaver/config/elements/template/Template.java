@@ -25,15 +25,23 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Template implements ConfigurationSerializable {
+    private static final Pattern TYPE_VARIANT = Pattern.compile(".+\\.(?<type>.+?)\\.(?<variant>.+?)\\.schem");
     private final String name;
     private final Map<String, Type> types = new LinkedHashMap<>();
-    private static final Pattern TYPE_VARIANT = Pattern.compile(".+\\.(?<type>.+?)\\.(?<variant>.+?)\\.schem");
 
 
     public Template(Map<String, Object> objectMap) {
         var map = SerializationUtil.mapOf(objectMap);
         name = map.getValue("name");
         List<Type> types = map.getValue("types");
+        types.forEach(type -> {
+            this.types.put(type.name().toLowerCase(Locale.ROOT), type);
+            type.link(this);
+        });
+    }
+
+    public Template(String name, List<Type> types) {
+        this.name = name;
         types.forEach(type -> {
             this.types.put(type.name().toLowerCase(Locale.ROOT), type);
             type.link(this);
@@ -47,14 +55,6 @@ public class Template implements ConfigurationSerializable {
                 .add("name", name)
                 .add("types", new ArrayList<>(types.values()))
                 .build();
-    }
-
-    public Template(String name, List<Type> types) {
-        this.name = name;
-        types.forEach(type -> {
-            this.types.put(type.name().toLowerCase(Locale.ROOT), type);
-            type.link(this);
-        });
     }
 
     public String name() {

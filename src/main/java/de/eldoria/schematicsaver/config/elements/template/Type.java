@@ -37,6 +37,14 @@ public class Type implements ConfigurationSerializable, Comparable<Type> {
         });
     }
 
+    public Type(String name, List<Variant> variants) {
+        this.name = name;
+        variants.forEach(variant -> {
+            this.variants.put(variant.name().toLowerCase(Locale.ROOT), variant);
+            variant.link(this);
+        });
+    }
+
     @Override
     @NotNull
     public Map<String, Object> serialize() {
@@ -48,15 +56,6 @@ public class Type implements ConfigurationSerializable, Comparable<Type> {
 
     void link(Template parent) {
         this.parent = parent;
-    }
-
-
-    public Type(String name, List<Variant> variants) {
-        this.name = name;
-        variants.forEach(variant -> {
-            this.variants.put(variant.name().toLowerCase(Locale.ROOT), variant);
-            variant.link(this);
-        });
     }
 
     public String name() {

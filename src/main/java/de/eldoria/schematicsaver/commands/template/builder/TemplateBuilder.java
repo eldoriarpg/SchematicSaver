@@ -9,6 +9,7 @@ package de.eldoria.schematicsaver.commands.template.builder;
 import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.localization.MessageComposer;
+import de.eldoria.schematicsaver.commands.util.Verifier;
 import de.eldoria.schematicsaver.config.elements.template.Template;
 import de.eldoria.schematicsaver.config.elements.template.Type;
 import de.eldoria.schematicsaver.util.TextColors;
@@ -25,10 +26,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TemplateBuilder implements Buildable<Template> {
-    private String name;
+    private final String name;
     @NotNull
     private Vector origin;
-    private Map<String, TypeBuilder> types = new LinkedHashMap<>();
+    private final Map<String, TypeBuilder> types = new LinkedHashMap<>();
 
     public TemplateBuilder(String name, Vector origin) {
         this.name = name;
@@ -40,6 +41,7 @@ public class TemplateBuilder implements Buildable<Template> {
     }
 
     public TypeBuilder addType(String name) throws CommandException {
+        Verifier.checkName(name);
         CommandAssertions.isFalse(types.containsKey(name.toLowerCase(Locale.ROOT)), "error.typeExists");
         types.computeIfAbsent(name.toLowerCase(Locale.ROOT), k -> new TypeBuilder(this, name));
         return types.get(name.toLowerCase(Locale.ROOT));
