@@ -30,6 +30,7 @@ public class AddVariant extends AdvancedCommand implements IPlayerTabExecutor {
         super(plugin, CommandMeta.builder("addVariant")
                 .addUnlocalizedArgument("type_name", true)
                 .addUnlocalizedArgument("variant_name", true)
+                .hidden()
                 .build());
         this.sessions = sessions;
         this.boundingRenderer = boundingRenderer;

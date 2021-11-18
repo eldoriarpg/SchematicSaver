@@ -26,6 +26,7 @@ public class ShowType extends AdvancedCommand implements IPlayerTabExecutor {
     public ShowType(Plugin plugin, Sessions sessions) {
         super(plugin, CommandMeta.builder("showType")
                 .addUnlocalizedArgument("type", true)
+                .hidden()
                 .build());
         this.sessions = sessions;
     }

@@ -32,6 +32,7 @@ public class ModifyVariant extends AdvancedCommand implements IPlayerTabExecutor
                 .addUnlocalizedArgument("variant_name", true)
                 .addUnlocalizedArgument("field", true)
                 .addUnlocalizedArgument("value", false)
+                .hidden()
                 .build());
         this.sessions = sessions;
     }

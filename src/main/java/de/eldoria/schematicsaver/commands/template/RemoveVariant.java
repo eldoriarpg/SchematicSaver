@@ -27,6 +27,7 @@ public class RemoveVariant extends AdvancedCommand implements IPlayerTabExecutor
         super(plugin, CommandMeta.builder("removeVariant")
                 .addUnlocalizedArgument("type", true)
                 .addUnlocalizedArgument("variant", true)
+                .hidden()
                 .build());
         this.sessions = sessions;
     }

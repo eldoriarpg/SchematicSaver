@@ -30,6 +30,7 @@ public class SelectVariantRegion extends AdvancedCommand implements IPlayerTabEx
         super(plugin, CommandMeta.builder("selectVariantRegion")
                 .addUnlocalizedArgument("type", true)
                 .addUnlocalizedArgument("variant", true)
+                .hidden()
                 .build());
         this.sessions = sessions;
     }

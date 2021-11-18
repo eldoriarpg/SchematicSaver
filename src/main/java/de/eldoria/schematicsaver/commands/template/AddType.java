@@ -25,6 +25,7 @@ public class AddType extends AdvancedCommand implements IPlayerTabExecutor {
     public AddType(Plugin plugin, Sessions sessions) {
         super(plugin, CommandMeta.builder("addType")
                 .addUnlocalizedArgument("type_name", true)
+                .hidden()
                 .build());
         this.sessions = sessions;
     }

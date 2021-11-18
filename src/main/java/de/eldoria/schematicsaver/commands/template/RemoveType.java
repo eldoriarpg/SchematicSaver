@@ -26,6 +26,7 @@ public class RemoveType extends AdvancedCommand implements IPlayerTabExecutor {
     public RemoveType(Plugin plugin, Sessions sessions) {
         super(plugin, CommandMeta.builder("removeType")
                 .addUnlocalizedArgument("type_name", true)
+                .hidden()
                 .build());
         this.sessions = sessions;
     }

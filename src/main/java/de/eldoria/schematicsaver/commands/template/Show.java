@@ -20,6 +20,7 @@ public class Show extends AdvancedCommand implements IPlayerTabExecutor {
 
     public Show(Plugin plugin, Sessions sessions) {
         super(plugin, CommandMeta.builder("show")
+                .hidden()
                 .build());
         this.sessions = sessions;
     }

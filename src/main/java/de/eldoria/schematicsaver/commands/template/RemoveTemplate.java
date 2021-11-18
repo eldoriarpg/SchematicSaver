@@ -27,6 +27,7 @@ public class RemoveTemplate extends AdvancedCommand implements IPlayerTabExecuto
     public RemoveTemplate(Plugin plugin, Configuration configuration) {
         super(plugin, CommandMeta.builder("removeTemplate")
                 .addUnlocalizedArgument("template", true)
+                .hidden()
                 .build());
         this.configuration = configuration;
     }

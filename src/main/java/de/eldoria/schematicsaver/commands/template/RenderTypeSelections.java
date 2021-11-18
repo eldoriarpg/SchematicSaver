@@ -29,6 +29,7 @@ public class RenderTypeSelections extends AdvancedCommand implements IPlayerTabE
         super(plugin, CommandMeta.builder("renderTypeSelections")
                 .addUnlocalizedArgument("type", true)
                 .addUnlocalizedArgument("seconds", false)
+                .hidden()
                 .build());
         this.sessions = sessions;
         this.render = render;

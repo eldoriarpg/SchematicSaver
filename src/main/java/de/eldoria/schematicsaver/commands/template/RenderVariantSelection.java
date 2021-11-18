@@ -29,6 +29,7 @@ public class RenderVariantSelection extends AdvancedCommand implements IPlayerTa
                 .addUnlocalizedArgument("type", true)
                 .addUnlocalizedArgument("variant", true)
                 .addUnlocalizedArgument("seconds", false)
+                .hidden()
                 .build());
         this.sessions = sessions;
         this.render = render;

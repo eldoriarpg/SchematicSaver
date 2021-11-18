@@ -27,6 +27,7 @@ public class ShowVariant extends AdvancedCommand implements IPlayerTabExecutor {
         super(plugin, CommandMeta.builder("showVariant")
                 .addUnlocalizedArgument("type", true)
                 .addUnlocalizedArgument("variant", true)
+                .hidden()
                 .build());
         this.sessions = sessions;
     }

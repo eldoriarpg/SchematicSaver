@@ -27,6 +27,7 @@ public class RenderTemplateSelections extends AdvancedCommand implements IPlayer
     public RenderTemplateSelections(Plugin plugin, Sessions sessions, BoundingRenderer render) {
         super(plugin, CommandMeta.builder("renderTemplateSelections")
                 .addUnlocalizedArgument("seconds", false)
+                .hidden()
                 .build());
         this.sessions = sessions;
         this.render = render;

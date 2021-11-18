@@ -22,6 +22,7 @@ public class ModifyTemplate extends AdvancedCommand implements IPlayerTabExecuto
         super(plugin, CommandMeta.builder("modifyTemplate")
                 .addUnlocalizedArgument("field", true)
                 .addUnlocalizedArgument("value", false)
+                .hidden()
                 .build());
         this.sessions = sessions;
     }
