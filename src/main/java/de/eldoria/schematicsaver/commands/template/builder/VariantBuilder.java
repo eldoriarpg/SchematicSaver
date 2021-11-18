@@ -94,10 +94,10 @@ public class VariantBuilder implements Buildable<Variant>, PathComponent {
                 .text(" <click:run_command:'/schemtemp selectVariantRegion %s'><%s>[Select]</click>", path(), TextColors.CHANGE)
                 .text(" <click:run_command:'/schemtemp modifyVariant %s selection'><%s>[Update]</click>", path(), TextColors.CHANGE)
                 .newLine()
-                .text("<%s>Rotation:<%s> %s <%s><click:suggest_command:'/schemtemp modifyVariant %s rotation '>[Change]</click>",
+                .text("<%s>Rotation:<%s> %s <%s><click:suggest_command:'/schemtemp modifyVariant %s rotation '>[Edit]</click>",
                         TextColors.NAME, TextColors.VALUE, rotation(), TextColors.CHANGE, path())
                 .newLine()
-                .text("<%s>Flip:<%s> %s <%s><click:suggest_command:'/schemtemp modifyVariant %s flip '>[Change]</click>",
+                .text("<%s>Flip:<%s> %s <%s><click:suggest_command:'/schemtemp modifyVariant %s flip '>[Edit]</click>",
                         TextColors.NAME, TextColors.VALUE, flipToString(flip()), TextColors.CHANGE, path())
                 .newLine()
                 .text("<%s><click:run_command:'/schemtemp showType %s'>[Back]</click>", TextColors.CHANGE, type().name());

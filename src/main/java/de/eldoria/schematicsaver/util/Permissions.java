@@ -50,6 +50,4 @@ public final class Permissions {
             public static final String VARIANT = perm(DELETE, "variant");
         }
     }
-
-
 }

@@ -22,6 +22,7 @@ import de.eldoria.schematicsaver.config.elements.template.Template;
 import de.eldoria.schematicsaver.config.elements.template.Type;
 import de.eldoria.schematicsaver.config.elements.template.Variant;
 import de.eldoria.schematicsaver.services.BoundingRenderer;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class SchematicSaver extends EldoPlugin {
 
         var localizer = ILocalizer.create(this, "en_US");
         localizer.setLocale("en_US");
-        MessageSender.create(this, "[SS]");
+        MessageSender.create(this, ChatColor.DARK_AQUA + "[SS]");
 
         var configuration = new Configuration(this);
 

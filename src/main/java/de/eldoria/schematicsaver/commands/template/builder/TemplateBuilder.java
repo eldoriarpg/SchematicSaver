@@ -107,7 +107,7 @@ public class TemplateBuilder implements Buildable<Template> {
                 .text(" <click:run_command:'/schemtemp renderTemplateSelections'><%s>[Show Selections]</click>", TextColors.CHANGE)
                 .newLine();
         var types = types().stream()
-                .map(type -> String.format("  <%s>%s <%s><click:run_command:'/schemtemp showType %s'>[Change]</click> <%s><click:run_command:'/schemtemp removeType %s'>[Remove]</click>",
+                .map(type -> String.format("  <%s>%s <%s><click:run_command:'/schemtemp showType %s'>[Edit]</click> <%s><click:run_command:'/schemtemp removeType %s'>[Remove]</click>",
                         TextColors.NAME, type.name(), TextColors.CHANGE, type.name(), TextColors.REMOVE, type.name()))
                 .collect(Collectors.toList());
         text.text(types)

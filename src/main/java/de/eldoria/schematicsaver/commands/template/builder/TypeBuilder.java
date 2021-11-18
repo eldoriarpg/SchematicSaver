@@ -109,7 +109,7 @@ public class TypeBuilder implements Buildable<Type>, PathComponent {
                 .text(" <click:run_command:'/schemtemp renderTypeSelections %s'><%s>[Show Selections]</click>", name(), TextColors.CHANGE)
                 .newLine();
         var types = variants().stream()
-                .map(variant -> String.format("  <%s>%s <%s><click:run_command:'/schemtemp showVariant %s %s'>[Change]</click> <%s><click:run_command:'/schemtemp removeVariant %s %s'>[Remove]</click>",
+                .map(variant -> String.format("  <%s>%s <%s><click:run_command:'/schemtemp showVariant %s %s'>[Edit]</click> <%s><click:run_command:'/schemtemp removeVariant %s %s'>[Remove]</click>",
                         TextColors.NAME, variant.name(), TextColors.CHANGE, name(), variant.name(), TextColors.REMOVE, name(), variant.name()))
                 .collect(Collectors.toList());
         text.text(types)
