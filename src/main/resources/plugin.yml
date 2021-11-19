@@ -1,0 +1,20 @@
+name: SchematicSaver
+main: de.eldoria.schematicsaver.SchematicSaver
+version: ${version}
+api-version: 1.13
+
+depend:
+  - WorldEdit
+
+softdepend:
+  - ProtocolLib
+
+commands:
+  schematictemplate:
+    description: Create templates for exporting
+    aliases:
+      - schemtemp
+  schematicExport:
+    description: Export schematics via templates
+    aliases:
+      - schemexp

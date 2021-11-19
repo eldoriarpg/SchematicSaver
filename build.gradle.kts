@@ -1,14 +1,13 @@
 plugins {
     id("org.cadixdev.licenser") version "0.6.1"
     id("com.github.johnrengelman.shadow") version "7.1.0"
-   id("de.chojo.publishdata") version "1.0.0a-SNAPSHOT"
+    id("de.chojo.publishdata") version "1.0.4"
     java
     `maven-publish`
 }
 
-
 group = "de.eldoria"
-version = "1.0"
+version = "1.0.0"
 val shadebase = "de.eldoria." + rootProject.name + ".libs."
 
 repositories {
@@ -19,7 +18,16 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc", "spigot-api", "1.13.2-R0.1-SNAPSHOT")
-    implementation("de.eldoria", "eldo-util", "1.12.0-DEV")
+    compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.7-SNAPSHOT")
+    compileOnly("org.jetbrains", "annotations", "20.1.0")
+
+    implementation("de.eldoria", "eldo-util", "1.12.8-DEV")
+
+    implementation("de.eldoria", "messageblocker", "1.1.0")
+    implementation("net.kyori", "adventure-platform-bukkit", "4.0.0")
+    implementation("net.kyori", "adventure-text-minimessage", "4.2.0-SNAPSHOT")
+    testImplementation("org.jetbrains", "annotations", "21.0.1")
+
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.6.0")
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine")
 }
@@ -33,6 +41,7 @@ java {
 license {
     header(rootProject.file("HEADER.txt"))
     include("**/*.java")
+    exclude("**/ClipboardTransformBaker.java")
 }
 
 tasks {
@@ -50,20 +59,24 @@ tasks {
             events("passed", "skipped", "failed")
         }
     }
+
     shadowJar {
-        relocate("de.eldoria.eldoutilities", shadebase + "eldoutilities")
+        //relocate("de.eldoria.eldoutilities", shadebase + "eldoutilities")
+        relocate("net.kyori", shadebase + "kyori")
         mergeServiceFiles()
     }
+
     processResources {
         from(sourceSets.main.get().resources.srcDirs) {
             filesMatching("plugin.yml") {
                 expand(
-                    "version" to project.version
+                    "version" to publishData.getVersion(true)
                 )
             }
             duplicatesStrategy = DuplicatesStrategy.INCLUDE
         }
     }
+
     register<Copy>("copyToServer") {
         val path = project.property("targetDir") ?: "";
         if (path.toString().isEmpty()) {
@@ -75,7 +88,8 @@ tasks {
     }
 }
 
-publishData{
+publishData {
+    hashLength = 7
     useEldoNexusRepos()
     publishTask("jar")
     publishTask("shadowJar")
