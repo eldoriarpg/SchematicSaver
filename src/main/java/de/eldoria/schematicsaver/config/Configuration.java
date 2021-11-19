@@ -24,6 +24,7 @@ public class Configuration extends EldoConfig {
 
     @Override
     protected void reloadConfigs() {
+        setVersion(1, false);
         pasteSettings = getConfig().getObject("pasteSettings", PasteSettings.class, new PasteSettings());
         renderSettings = getConfig().getObject("pasteSettings", RenderSettings.class, new RenderSettings());
         templateRegistry = loadConfig(TEMPLATE_FILE, null, false).getObject("templates", TemplateRegistry.class, new TemplateRegistry());

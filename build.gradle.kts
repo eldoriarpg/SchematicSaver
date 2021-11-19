@@ -1,7 +1,7 @@
 plugins {
     id("org.cadixdev.licenser") version "0.6.1"
     id("com.github.johnrengelman.shadow") version "7.1.0"
-    id("de.chojo.publishdata") version "1.0.2"
+    id("de.chojo.publishdata") version "1.0.4"
     java
     `maven-publish`
 }
@@ -21,9 +21,7 @@ dependencies {
     compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.7-SNAPSHOT")
     compileOnly("org.jetbrains", "annotations", "20.1.0")
 
-    implementation("de.eldoria", "eldo-util", "1.12.5-DEV"){
-        isChanging = true
-    }
+    implementation("de.eldoria", "eldo-util", "1.12.8-DEV")
 
     implementation("de.eldoria", "messageblocker", "1.1.0")
     implementation("net.kyori", "adventure-platform-bukkit", "4.0.0")
